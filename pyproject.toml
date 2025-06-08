@@ -1,0 +1,14 @@
+[build-system]
+requires = []
+build-backend = ""
+
+[project]
+name = "brax-training-viewer"
+version = "0.1.0"
+description = "Real-time policy visualization for Brax RL training"
+authors = [
+    { name="Shouyue Hu", email="bruce.shouyue.hu@gmail.com" }
+]
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [] 
