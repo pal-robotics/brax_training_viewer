@@ -23,7 +23,7 @@ frontend_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'fr
 app.mount("/static", StaticFiles(directory=frontend_dir), name="static")
 
 # Global storage
-initial_system_json_b64 = None
+initial_system_json = None
 latest_trajectory = None
 websocket_clients: Set[WebSocket] = set()
 
@@ -32,7 +32,7 @@ latest_data_cache = {}
 
 # Data models
 class SystemData(BaseModel):
-    system_json_b64: str
+    system_json: dict  # Change from system_json_b64: str to system_json: dict
 
 class RolloutData(BaseModel):
     trajectory: str  # JSON string
@@ -42,19 +42,18 @@ class ListenData(BaseModel):
 
 @app.post("/system")
 def receive_system(data: SystemData):
-    global initial_system_json_b64
-    initial_system_json_b64 = data.system_json_b64
+    global initial_system_json
+    initial_system_json = data.system_json
     return {"status": "ok"}
 
 @app.post("/rollout")
-async def receive_rollout(data: RolloutData):
-    global latest_trajectory
-    latest_trajectory = data.trajectory
+async def receive_rollout(data: SystemData):
+    # Broadcast the new system JSON to all WebSocket clients
     to_remove = []
     for ws in websocket_clients:
         try:
-            print("Sending trajectory to client.")
-            await ws.send_text(latest_trajectory)
+            print("Sending new system to client.")
+            await ws.send_text(json.dumps(data.system_json))
         except Exception as e:
             print(f"Error sending to client: {e}")
             to_remove.append(ws)

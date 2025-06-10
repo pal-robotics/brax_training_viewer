@@ -78,7 +78,7 @@ def empty_fn(*args, **kwargs):
 make_inference_fn, params, _ = train_fn(environment=env, progress_fn=empty_fn)
 
 
-params = model.load_params('tests/params')
+params = model.load_params('tests/params_bad')
 inference_fn = make_inference_fn(params)
 
 

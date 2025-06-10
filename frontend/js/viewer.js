@@ -354,6 +354,18 @@ class Viewer {
     }
     this.setDirty();
   }
+
+  /**
+   * Loads a new trajectory (joint positions) into the viewer without recreating the scene.
+   * @param {Object} newSystem The system object containing the new trajectory data.
+   */
+  loadNewTrajectory(newSystem) {
+    console.log("loadNewTrajectory called with:", newSystem);
+    const newTrajectory = createTrajectory(newSystem);
+    console.log("Extracted newTrajectory:", newTrajectory);
+    this.animator.load(newTrajectory, {});
+    this.setDirty();
+  }
 }
 
 export {Viewer};
