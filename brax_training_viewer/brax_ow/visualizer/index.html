@@ -48,16 +48,17 @@
   system = JSON.parse(system);
   </script>
 
-  <body>
+<body>
 
-    <div id="brax-viewer"></div>
+  <div id="brax-viewer"></div>
 
-    <script type="module">
-      import {Viewer} from 'viewer';
-      const domElement = document.getElementById("brax-viewer");
-      var viewer = new Viewer(domElement, system);
-    </script>
+  <script type="module">
+    import {Viewer, setupLiveFrameWebSocket} from 'viewer';
+    const domElement = document.getElementById("brax-viewer");
+    var viewer = new Viewer(domElement, system);
+    setupLiveFrameWebSocket(system, viewer);
+  </script>
 
-  </body>
+</body>
 
 </html>

@@ -1,6 +1,9 @@
 import functools
 import jax
 import os
+import asyncio
+import websockets
+import numpy as np
 
 from datetime import datetime
 from jax import numpy as jp
@@ -11,14 +14,17 @@ import matplotlib.pyplot as plt
 import brax
 import flax
 from brax import envs
+import json
 from brax.io import model
-from brax.io import json
+import json as std_json
+from brax.io import json as brax_json
 # from brax.io import html
 
 import sys
 import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from brax_training_viewer.brax_ow.io import html
+from brax_training_viewer.backend import send_frame_to_web_clients
 
 from brax.training.agents.ppo import train as ppo
 from brax.training.agents.sac import train as sac
@@ -39,6 +45,7 @@ env = envs.get_environment(env_name=env_name,
                            backend=backend)
 state = jax.jit(env.reset)(rng=jax.random.PRNGKey(seed=0))
 
+print(env.sys.link_names)
 
 # We determined some reasonable hyperparameters offline and share them here.
 train_fn = {
@@ -91,17 +98,91 @@ env = envs.create(env_name=env_name, backend=backend)
 jit_env_reset = jax.jit(env.reset)
 jit_env_step = jax.jit(env.step)
 jit_inference_fn = jax.jit(inference_fn)
+print("Jitted")
 
-rollout = []
-rng = jax.random.PRNGKey(seed=1)
-state = jit_env_reset(rng=rng)
-for _ in range(1000):
-  
-  rollout.append(state.pipeline_state)
-  act_rng, rng = jax.random.split(rng)
-  act, _ = jit_inference_fn(state.obs, act_rng)
-  state = jit_env_step(state, act)
+print("Starting stream")
 
-with open("frontend/index.html", "w") as f:
-    f.write(html.render(env.sys.tree_replace({'opt.timestep': env.dt}), rollout))
+
+import asyncio
+import websockets
+import jax
+from brax.io import json  # Brax JSON tools
+from brax import envs
+
+def state_to_dict(state: 'brax.State'):
+    """Convert a brax State to a dict, handling all data if exists."""
+    out = {}
+
+    # q: (q_size,) joint position vector
+    if hasattr(state, 'q') and state.q is not None:
+        out['q'] = getattr(state.q, 'tolist', lambda: state.q)()
+
+    # qd: (qd_size,) joint velocity vector
+    if hasattr(state, 'qd') and state.qd is not None:
+        out['qd'] = getattr(state.qd, 'tolist', lambda: state.qd)()
+
+    # x: (num_links,) link position in world frame
+    if hasattr(state, 'x') and state.x is not None:
+        x = state.x
+        out['x'] = {}
+        if hasattr(x, 'pos') and x.pos is not None:
+            out['x']['pos'] = getattr(x.pos, 'tolist', lambda: x.pos)()
+        if hasattr(x, 'rot') and x.rot is not None:
+            out['x']['rot'] = getattr(x.rot, 'tolist', lambda: x.rot)()
+
+    # xd: (num_links,) link velocity in world frame
+    if hasattr(state, 'xd') and state.xd is not None:
+        xd = state.xd
+        out['xd'] = {}
+        if hasattr(xd, 'vel') and xd.vel is not None:
+            out['xd']['vel'] = getattr(xd.vel, 'tolist', lambda: xd.vel)()
+        if hasattr(xd, 'ang') and xd.ang is not None:
+            out['xd']['ang'] = getattr(xd.ang, 'tolist', lambda: xd.ang)()
+
+    # contact: calculated contacts
+    if hasattr(state, 'contact') and state.contact is not None:
+        contact = state.contact
+        contact_dict = {}
+        # Try to serialize common contact fields if they exist
+        for attr in ['link_idx', 'elasticity']:
+            if hasattr(contact, attr):
+                val = getattr(contact, attr)
+                contact_dict[attr] = getattr(val, 'tolist', lambda: val)()
+        if contact_dict:
+            out['contact'] = contact_dict
+
+    return out
+
+async def stream_frames():
+    uri = "ws://localhost:8000/ws/frame"
+    async with websockets.connect(uri) as websocket:
+        rng = jax.random.PRNGKey(seed=1)
+
+        env = envs.create(env_name=env_name, backend=backend)
+
+        jit_env_reset = jax.jit(env.reset)
+        jit_env_step = jax.jit(env.step)
+        jit_inference_fn = jax.jit(inference_fn)
+
+        state = jit_env_reset(rng=rng)
+
+        for _ in range(1000):
+            # print(env.sys, state.pipeline_state)
+            frame_json = std_json.dumps(state_to_dict(state.pipeline_state))
+            # frame_json = brax_json.dumps(env.sys, [state.pipeline_state])
+
+            await websocket.send(frame_json)
+
+            # Optional: control the frame rate
+            await asyncio.sleep(0.01)
+
+            act_rng, rng = jax.random.split(rng)
+            act, _ = jit_inference_fn(state.obs, act_rng)
+            state = jit_env_step(state, act)
+
+        await websocket.close()
+
+if __name__ == "__main__":
+    asyncio.run(stream_frames())
+
 

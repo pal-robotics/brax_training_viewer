@@ -6,6 +6,7 @@ from pydantic import BaseModel
 from typing import Set
 import os
 import json
+import asyncio
 
 app = FastAPI()
 
@@ -86,18 +87,29 @@ async def listen_message(request: Request):
 def get_state():
     return latest_data_cache
 
-@app.websocket("/ws/rollout")
-async def websocket_endpoint(websocket: WebSocket):
+@app.websocket("/ws/frame")
+async def websocket_frame(websocket: WebSocket):
     await websocket.accept()
     websocket_clients.add(websocket)
-    print("Client connected. Total clients:", len(websocket_clients))
+    print("Client connected to /ws/frame. Total clients:", len(websocket_clients))
     try:
         while True:
-            await websocket.receive_text()  # Keep connection alive
+            frame = await websocket.receive_text()
+            print(f"Received frame from backend: {frame}")  # Debug print
+            # Broadcast to all frontend clients (including sender if needed)
+            to_remove = []
+            for ws in websocket_clients:
+                try:
+                    await ws.send_text(frame)
+                except Exception as e:
+                    print(f"Error sending frame to client: {e}")
+                    to_remove.append(ws)
+            for ws in to_remove:
+                websocket_clients.remove(ws)
     except WebSocketDisconnect:
-        print("Client disconnected.")
+        print("Client disconnected from /ws/frame.")
     except Exception as e:
-        print("WebSocket error:", e)
+        print("WebSocket error (/ws/frame):", e)
     finally:
         websocket_clients.discard(websocket)
         print("Remaining clients:", len(websocket_clients))
@@ -105,3 +117,23 @@ async def websocket_endpoint(websocket: WebSocket):
 @app.get("/", response_class=HTMLResponse)
 def show_rollout():
     return FileResponse(os.path.join(frontend_dir, "index.html"))
+
+async def send_frame_to_web_clients(frame):
+    """
+    Sends a frame (state) to all connected frontend WebSocket clients.
+    This function can be called from other scripts (e.g., humanoid_live.py).
+    """
+    # print(f"Sending frame to web clients: {frame}")
+    # print(f"websocket_clients: {websocket_clients}")
+    to_remove = []
+    for ws in websocket_clients:
+        try:
+            if isinstance(frame, dict):
+                await ws.send_text(json.dumps(frame))
+            else:
+                await ws.send_text(frame)
+        except Exception as e:
+            print(f"Error sending frame to client: {e}")
+            to_remove.append(ws)
+    for ws in to_remove:
+        websocket_clients.remove(ws)
