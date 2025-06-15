@@ -337,8 +337,9 @@ function handleFrame(frameJson) {
 function setupLiveFrameWebSocket(system, viewer) {
   viewerInstance = viewer;
   const ws = new WebSocket(`ws://${window.location.host}/ws/frame`);
-  ws.onopen = () => console.log('Connected to live frame WebSocket');
+  ws.onopen = () => console.log('Connected to live frame WebSocket:', window.location.host);
   ws.onmessage = (event) => {
+    console.log("Received frame:", event.data);
     handleFrame(event.data);
   };
   ws.onclose = () => console.log('WebSocket closed');

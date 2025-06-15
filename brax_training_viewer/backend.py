@@ -1,12 +1,10 @@
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Request
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse, FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from pydantic import BaseModel
-from typing import Set
 import os
-import json
-import asyncio
+from typing import Set
+import uvicorn
 
 app = FastAPI()
 
@@ -23,80 +21,18 @@ app.add_middleware(
 frontend_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'frontend'))
 app.mount("/static", StaticFiles(directory=frontend_dir), name="static")
 
-# Global storage
-initial_system_json = None
-latest_trajectory = None
+# WebSocket clients set
 websocket_clients: Set[WebSocket] = set()
-
-# Store the latest data (flexible, for multiple fields)
-latest_data_cache = {}
-
-# Data models
-class SystemData(BaseModel):
-    system_json: dict  # Change from system_json_b64: str to system_json: dict
-
-class RolloutData(BaseModel):
-    trajectory: str  # JSON string
-
-class ListenData(BaseModel):
-    message: str
-
-@app.post("/system")
-def receive_system(data: SystemData):
-    global initial_system_json
-    initial_system_json = data.system_json
-    return {"status": "ok"}
-
-@app.post("/rollout")
-async def receive_rollout(data: SystemData):
-    # Broadcast the new system JSON to all WebSocket clients
-    to_remove = []
-    for ws in websocket_clients:
-        try:
-            print("Sending new system to client.")
-            await ws.send_text(json.dumps(data.system_json))
-        except Exception as e:
-            print(f"Error sending to client: {e}")
-            to_remove.append(ws)
-    for ws in to_remove:
-        websocket_clients.remove(ws)
-    return {"status": "ok"}
-
-@app.post("/listen")
-async def listen_message(request: Request):
-    global latest_data_cache
-    data = await request.json()
-    if not isinstance(data, dict):
-        return {"status": "error", "detail": "Payload must be a JSON object"}
-    # Merge new data into cache
-    latest_data_cache.update(data)
-    to_remove = []
-    for ws in websocket_clients:
-        try:
-            print(f"Sending message to client: {data}")
-            # Send as JSON string
-            await ws.send_text(json.dumps(data))
-        except Exception as e:
-            print(f"Error sending to client: {e}")
-            to_remove.append(ws)
-    for ws in to_remove:
-        websocket_clients.remove(ws)
-    return {"status": "ok"}
-
-@app.get("/state")
-def get_state():
-    return latest_data_cache
 
 @app.websocket("/ws/frame")
 async def websocket_frame(websocket: WebSocket):
     await websocket.accept()
     websocket_clients.add(websocket)
-    print("Client connected to /ws/frame. Total clients:", len(websocket_clients))
+    print("Client connected to /ws/frame. Total clients:", len(websocket_clients), "from", websocket.client.host)
     try:
         while True:
             frame = await websocket.receive_text()
             print(f"Received frame from backend: {frame}")  # Debug print
-            # Broadcast to all frontend clients (including sender if needed)
             to_remove = []
             for ws in websocket_clients:
                 try:
@@ -107,7 +43,7 @@ async def websocket_frame(websocket: WebSocket):
             for ws in to_remove:
                 websocket_clients.remove(ws)
     except WebSocketDisconnect:
-        print("Client disconnected from /ws/frame.")
+        print("Client disconnected from /ws/frame.", "from", websocket.client.host)
     except Exception as e:
         print("WebSocket error (/ws/frame):", e)
     finally:
@@ -118,22 +54,14 @@ async def websocket_frame(websocket: WebSocket):
 def show_rollout():
     return FileResponse(os.path.join(frontend_dir, "index.html"))
 
-async def send_frame_to_web_clients(frame):
+
+
+
+def run_web_server(host: str = "127.0.0.1", port: int = 8000, reload: bool = True):
     """
-    Sends a frame (state) to all connected frontend WebSocket clients.
-    This function can be called from other scripts (e.g., humanoid_live.py).
+    Launches the FastAPI web server for visualization.
     """
-    # print(f"Sending frame to web clients: {frame}")
-    # print(f"websocket_clients: {websocket_clients}")
-    to_remove = []
-    for ws in websocket_clients:
-        try:
-            if isinstance(frame, dict):
-                await ws.send_text(json.dumps(frame))
-            else:
-                await ws.send_text(frame)
-        except Exception as e:
-            print(f"Error sending frame to client: {e}")
-            to_remove.append(ws)
-    for ws in to_remove:
-        websocket_clients.remove(ws)
+    uvicorn.run("backend:app", host=host, port=port, reload=reload)
+
+if __name__ == "__main__":
+    run_web_server() 

@@ -9,8 +9,6 @@ from datetime import datetime
 from jax import numpy as jp
 import matplotlib.pyplot as plt
 
-
-
 import brax
 import flax
 from brax import envs
@@ -18,13 +16,10 @@ import json
 from brax.io import model
 import json as std_json
 from brax.io import json as brax_json
-# from brax.io import html
 
 import sys
-import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from brax_training_viewer.brax_ow.io import html
-from brax_training_viewer.backend import send_frame_to_web_clients
+from brax_training_viewer.utils import state_to_dict
 
 from brax.training.agents.ppo import train as ppo
 from brax.training.agents.sac import train as sac
@@ -32,22 +27,17 @@ from brax.training.agents.sac import train as sac
 
 """First let's pick an environment and a backend to train an agent in.
 
-Recall from the [Brax Basics](https://github.com/google/brax/blob/main/notebooks/basics.ipynb) colab, that the backend specifies which physics engine to use, each with different trade-offs between physical realism and training throughput/speed. The engines generally decrease in physical realism but increase in speed in the following order: `generalized`,  `positional`, then `spring`.
-
+Recall from the [Brax Basics](https://github.com/google/brax/blob/main/notebooks/basics.ipynb) colab, that the backend specifies which physics engine to use.
 """
 
-#@title Load Env { run: "auto" }
+# Load Env
+env_name = 'humanoid'
+backend = 'positional'
 
-env_name = 'humanoid'  # @param ['ant', 'halfcheetah', 'hopper', 'humanoid', 'humanoidstandup', 'inverted_pendulum', 'inverted_double_pendulum', 'pusher', 'reacher', 'walker2d']
-backend = 'positional'  # @param ['generalized', 'positional', 'spring']
-
-env = envs.get_environment(env_name=env_name,
-                           backend=backend)
+env = envs.get_environment(env_name=env_name, backend=backend)
 state = jax.jit(env.reset)(rng=jax.random.PRNGKey(seed=0))
 
-print(env.sys.link_names)
-
-# We determined some reasonable hyperparameters offline and share them here.
+# Define training configuration per environment
 train_fn = {
   'inverted_pendulum': functools.partial(ppo.train, num_timesteps=2_000_000, num_evals=20, reward_scaling=10, episode_length=1000, normalize_observations=True, action_repeat=1, unroll_length=5, num_minibatches=32, num_updates_per_batch=4, discounting=0.97, learning_rate=3e-4, entropy_cost=1e-2, num_envs=2048, batch_size=1024, seed=1),
   'inverted_double_pendulum': functools.partial(ppo.train, num_timesteps=20_000_000, num_evals=20, reward_scaling=10, episode_length=1000, normalize_observations=True, action_repeat=1, unroll_length=5, num_minibatches=32, num_updates_per_batch=4, discounting=0.97, learning_rate=3e-4, entropy_cost=1e-2, num_envs=2048, batch_size=1024, seed=1),
@@ -61,128 +51,58 @@ train_fn = {
   'pusher': functools.partial(ppo.train, num_timesteps=50_000_000, num_evals=20, reward_scaling=5, episode_length=1000, normalize_observations=True, action_repeat=1, unroll_length=30, num_minibatches=16, num_updates_per_batch=8, discounting=0.95, learning_rate=3e-4,entropy_cost=1e-2, num_envs=2048, batch_size=512, seed=3),
 }[env_name]
 
-
-max_y = {'ant': 8000, 'halfcheetah': 8000, 'hopper': 2500, 'humanoid': 13000, 'humanoidstandup': 75_000, 'reacher': 5, 'walker2d': 5000, 'pusher': 0}[env_name]
-min_y = {'reacher': -100, 'pusher': -150}.get(env_name, 0)
-
-xdata, ydata = [], []
-times = [datetime.now()]
-
+# Optional plotting hook
 def progress(num_steps, metrics):
-  times.append(datetime.now())
-  xdata.append(num_steps)
-  ydata.append(metrics['eval/episode_reward'])
-  # plt.xlim([0, train_fn.keywords['num_timesteps']])
-  # plt.ylim([min_y, max_y])
-  # plt.xlabel('# environment steps')
-  # plt.ylabel('reward per episode')
-  # plt.plot(xdata, ydata)
-  # plt.show()
+  pass  # Disabled interactive matplotlib use
 
-# make_inference_fn, params, _ = train_fn(environment=env, progress_fn=progress)
-def empty_fn(*args, **kwargs):
-  pass
-make_inference_fn, params, _ = train_fn(environment=env, progress_fn=empty_fn)
-
-
+make_inference_fn, params, _ = train_fn(environment=env, progress_fn=progress)
 params = model.load_params('tests/params_bad')
 inference_fn = make_inference_fn(params)
 
-
-
-#@title Visualizing a trajectory of the learned inference function
-
-# create an env with auto-reset
+# Set up jitted inference and environment
 env = envs.create(env_name=env_name, backend=backend)
-
 jit_env_reset = jax.jit(env.reset)
 jit_env_step = jax.jit(env.step)
 jit_inference_fn = jax.jit(inference_fn)
-print("Jitted")
 
+print("Jitted")
 print("Starting stream")
 
 
-import asyncio
-import websockets
-import jax
-from brax.io import json  # Brax JSON tools
-from brax import envs
 
-def state_to_dict(state: 'brax.State'):
-    """Convert a brax State to a dict, handling all data if exists."""
-    out = {}
 
-    # q: (q_size,) joint position vector
-    if hasattr(state, 'q') and state.q is not None:
-        out['q'] = getattr(state.q, 'tolist', lambda: state.q)()
 
-    # qd: (qd_size,) joint velocity vector
-    if hasattr(state, 'qd') and state.qd is not None:
-        out['qd'] = getattr(state.qd, 'tolist', lambda: state.qd)()
+async def generate_simulation_frames(env, inference_fn, steps=1000):
+    """Yields serialized JSON simulation frames."""
+    rng = jax.random.PRNGKey(seed=1)
 
-    # x: (num_links,) link position in world frame
-    if hasattr(state, 'x') and state.x is not None:
-        x = state.x
-        out['x'] = {}
-        if hasattr(x, 'pos') and x.pos is not None:
-            out['x']['pos'] = getattr(x.pos, 'tolist', lambda: x.pos)()
-        if hasattr(x, 'rot') and x.rot is not None:
-            out['x']['rot'] = getattr(x.rot, 'tolist', lambda: x.rot)()
+    jit_env_reset = jax.jit(env.reset)
+    jit_env_step = jax.jit(env.step)
+    jit_inference_fn = jax.jit(inference_fn)
 
-    # xd: (num_links,) link velocity in world frame
-    if hasattr(state, 'xd') and state.xd is not None:
-        xd = state.xd
-        out['xd'] = {}
-        if hasattr(xd, 'vel') and xd.vel is not None:
-            out['xd']['vel'] = getattr(xd.vel, 'tolist', lambda: xd.vel)()
-        if hasattr(xd, 'ang') and xd.ang is not None:
-            out['xd']['ang'] = getattr(xd.ang, 'tolist', lambda: xd.ang)()
+    state = jit_env_reset(rng=rng)
 
-    # contact: calculated contacts
-    if hasattr(state, 'contact') and state.contact is not None:
-        contact = state.contact
-        contact_dict = {}
-        # Try to serialize common contact fields if they exist
-        for attr in ['link_idx', 'elasticity']:
-            if hasattr(contact, attr):
-                val = getattr(contact, attr)
-                contact_dict[attr] = getattr(val, 'tolist', lambda: val)()
-        if contact_dict:
-            out['contact'] = contact_dict
+    for _ in range(steps):
+        frame_json = std_json.dumps(state_to_dict(state.pipeline_state))
+        yield frame_json
 
-    return out
+        act_rng, rng = jax.random.split(rng)
+        act, _ = jit_inference_fn(state.obs, act_rng)
+        state = jit_env_step(state, act)
 
-async def stream_frames():
-    uri = "ws://localhost:8000/ws/frame"
+
+async def send_frames_over_websocket(uri: str, frame_generator):
+    """Handles sending frames via websocket."""
     async with websockets.connect(uri) as websocket:
-        rng = jax.random.PRNGKey(seed=1)
+        async for frame in frame_generator:
+            await websocket.send(frame)
 
-        env = envs.create(env_name=env_name, backend=backend)
 
-        jit_env_reset = jax.jit(env.reset)
-        jit_env_step = jax.jit(env.step)
-        jit_inference_fn = jax.jit(inference_fn)
+async def main():
+    uri = "ws://localhost:8000/ws/frame"
+    frame_gen = generate_simulation_frames(env, inference_fn)
+    await send_frames_over_websocket(uri, frame_gen)
 
-        state = jit_env_reset(rng=rng)
-
-        for _ in range(1000):
-            # print(env.sys, state.pipeline_state)
-            frame_json = std_json.dumps(state_to_dict(state.pipeline_state))
-            # frame_json = brax_json.dumps(env.sys, [state.pipeline_state])
-
-            await websocket.send(frame_json)
-
-            # Optional: control the frame rate
-            await asyncio.sleep(0.01)
-
-            act_rng, rng = jax.random.split(rng)
-            act, _ = jit_inference_fn(state.obs, act_rng)
-            state = jit_env_step(state, act)
-
-        await websocket.close()
 
 if __name__ == "__main__":
-    asyncio.run(stream_frames())
-
-
+    asyncio.run(main())
