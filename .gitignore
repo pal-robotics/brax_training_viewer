@@ -163,3 +163,4 @@ cython_debug/
 
 # Local files
 tests/params*
+*.DS_Store

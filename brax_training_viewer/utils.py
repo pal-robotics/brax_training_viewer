@@ -1,7 +1,16 @@
 from brax import State
+from jax import tree_util
+import jax.numpy as jnp
 
-def state_to_dict(state: State):
-    """Convert a brax State to a dict, handling all data if exists."""
+def unbatch_state(state: State, index: int) -> State:
+    """Extract the index-th sample from a batched brax State"""
+    return tree_util.tree_map(lambda x: x[index] if isinstance(x, jnp.ndarray) and x.ndim > 0 else x, state)
+
+def state_to_dict(state: State, index: int = 0):
+    """Convert a brax State (batched or unbatched) to a dict."""
+ 
+    state = unbatch_state(state, index)
+
     out = {}
 
     if hasattr(state, 'q') and state.q is not None:

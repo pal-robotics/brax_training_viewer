@@ -303,7 +303,20 @@ class Viewer {
 let viewerInstance = null;
 
 function handleFrame(frameJson) {
-  const frame = JSON.parse(frameJson).x;
+  let parsed;
+  try {
+    parsed = JSON.parse(frameJson);
+  } catch (e) {
+    console.error("JSON parse error:", e);
+    return;
+  }
+
+  if (!parsed.x || !parsed.x.pos || !parsed.x.rot) {
+    console.warn("Invalid frame: missing x/pos/rot", parsed);
+    return;
+  }
+
+  const frame = parsed.x;
   const scene = viewerInstance.scene;
 
   if (!frame.pos || !frame.rot) {

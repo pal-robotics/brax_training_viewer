@@ -1,9 +1,15 @@
+import sys, os
+sys.path.insert(0, '/Users/shouyuehu/Projects/brax_training_viewer/brax_training_viewer')
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+import brax
+print("Using brax from:", brax.__file__)
+
 # JAX Imports:
 import jax
 import jax.numpy as jnp
 
 # Brax Imports:
-from brax.mjx import pipeline
 from brax.io import mjcf
 from brax.envs.base import PipelineEnv, State
 
@@ -12,23 +18,9 @@ import functools
 from brax.training.agents.ppo import networks as ppo_networks
 from brax.training.agents.ppo import train as ppo
 
-import asyncio
-import websockets
-import json as std_json
 
-
-
-import asyncio
-import jax
-import json as std_json
-import websockets
-
-import sys, os
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from brax_training_viewer.websocket_streamer import WebSocketStateStreamer
 from brax_training_viewer.brax_ow.io import html
-
-import jax.numpy as jnp
 
 xml_model = """
 <mujoco model="inverted pendulum">
@@ -195,12 +187,12 @@ def main():
 
     train_fn = functools.partial(
         ppo.train,
-        num_timesteps=30000,
+        num_timesteps=40000,
         num_evals=10,
-        episode_length=200,
-        num_envs=8,
+        episode_length=300,
+        num_envs=4,
         num_eval_envs=4,
-        batch_size=8,
+        batch_size=4,
         num_minibatches=4,
         unroll_length=20,
         num_updates_per_batch=4,
