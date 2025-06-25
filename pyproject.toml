@@ -1,0 +1,25 @@
+[project]
+name = "braxviewer"
+version = "0.1.0"
+description = "A web-based real-time visualization tool for Brax training"
+authors = [
+    { name = "Shouyue Hu", email = "bruce.shouyue.hu@gmail.com" },
+    { name = "", email = "" },
+    { name = "", email = "" },
+    { name = "", email = "" }
+]
+readme = { file = "README.md", content-type = "text/markdown" }
+requires-python = ">=3.10"
+license = { file = "LICENSE" }
+keywords = [
+    "visualization",
+    "reinforcement learning",
+    "web",
+    "brax"
+]
+dependencies = [
+    "asyncio",
+    "brax",
+    "fastapi",
+    "uvicorn",
+]
