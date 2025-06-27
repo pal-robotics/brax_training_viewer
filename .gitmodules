@@ -1,0 +1,3 @@
+[submodule "brax"]
+	path = brax
+	url = https://github.com/google/brax.git
