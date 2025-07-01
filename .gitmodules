@@ -1,3 +1,3 @@
 [submodule "brax"]
 	path = brax
-	url = https://github.com/pal-robotics-forks/brax.git
+	url = https://github.com/google/brax.git
