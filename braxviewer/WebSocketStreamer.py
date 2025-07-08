@@ -42,7 +42,7 @@ class WebSocketStreamer:
         while self._started:
             try:
                 async with websockets.connect(self.uri) as ws:
-                    print("[WebSocket] Streamer connected.")
+                    # print("[WebSocket] Streamer connected.")
                     while True:
                         # Get a state from the synchronous queue in a non-blocking way.
                         state = await loop.run_in_executor(None, self._state_queue.get)
@@ -56,12 +56,13 @@ class WebSocketStreamer:
                             )
                             await ws.send(frame_json)
                         except Exception as e:
-                            print(f"[WebSocket] Failed to send frame: {e}")
+                            # print(f"[WebSocket] Failed to send frame: {e}")
+                            continue
             except (websockets.exceptions.ConnectionClosed, ConnectionRefusedError) as e:
-                print(f"[WebSocket] Connection error ({e}), retrying in 3 seconds...")
+                # print(f"[WebSocket] Connection error ({e}), retrying in 3 seconds...")
                 await asyncio.sleep(3)
             except Exception as e:
-                print(f"[WebSocket] An unexpected error occurred: {e}")
+                # print(f"[WebSocket] An unexpected error occurred: {e}")
                 break
 
     def send(self, state, discard_queue: bool = False):
@@ -89,4 +90,4 @@ class WebSocketStreamer:
             self._state_queue.put(None)  # Send sentinel to stop the loop
             if self._thread and self._thread.is_alive():
                 self._thread.join()
-            print("[WebSocket] Streamer stopped.")
+            # print("[WebSocket] Streamer stopped.")
