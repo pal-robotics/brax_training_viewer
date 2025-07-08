@@ -23,3 +23,7 @@ As this tool extends the official Brax PPO training function, it ensures seamles
 - run `pip install -r requirements.txt `
 - you can try examples in `demo/` folder. For example, `python demo/cartpole.py`
 - open a web browser, go to page `http://127.0.0.1:8000/` for the viewer
+
+## TODO
+- use other datatype instead of json to reduce computation
+- toggle for render on/off

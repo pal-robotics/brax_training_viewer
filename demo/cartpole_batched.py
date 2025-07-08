@@ -13,9 +13,7 @@ from brax.envs.base import PipelineEnv, State
 
 # Import custom modules and brax training modules
 from braxviewer.WebViewerBatched import WebViewerBatched
-from braxviewer.utils import concatenate_envs_xml
-# Assuming the custom ppo train function is located here
-from braxviewer.brax.training.agents.ppo import train as ppo
+from braxviewer.brax.brax.training.agents.ppo import train as ppo
 from brax.training.agents.ppo import networks as ppo_networks
 
 
@@ -29,8 +27,8 @@ xml_model = """
     <default><joint armature="0" damping="1"/><geom contype="0" conaffinity="0" friction="1 0.1 0.1"/></default>
     <worldbody>
         <light diffuse=".5 .5 .5" pos="0 0 3" dir="0 0 -1"/>
-        <geom name="rail" type="capsule"  size="0.02 1.5" pos="0 0 0" quat="1 0 1 0" rgba="1 1 1 1"/>
         <body name="cart" pos="0 0 0">
+            <geom name="rail" type="capsule"  size="0.02 1.5" pos="0 0 0" quat="1 0 1 0" rgba="1 1 1 1"/>
             <joint name="slider" type="slide" axis="1 0 0" pos="0 0 0" limited="true" range="-1.5 1.5"/>
             <geom name="cart_geom" pos="0 0 0" quat="1 0 1 0" size="0.1 0.1" type="capsule"/>
             <body name="pole" pos="0 0 0">
@@ -80,34 +78,47 @@ class CartPole(PipelineEnv):
 if __name__ == "__main__":
     # --- 1. Environment and Viewer Setup ---
     
-    # Set the number of parallel environments based on your code
     num_parallel_envs = 8
+    
+    # Define the 3D grid layout: (cols, rows, layers)
+    # For a 2x2x2 cube:
+    grid_dims = (2, 2, 2)
+    # For a flat 4x2 grid, use: grid_dims = (4, 2, 1)
+    # For a vertical stack, use: grid_dims = (1, 1, 8)
+    
+    # Define the spacing for each grid cell
+    env_offset_3d = (4.0, 4.0, 2.0)
 
-    # a) The original, single-agent env for training and evaluation.
+    # Ensure the grid dimensions can hold all environments
+    grid_capacity = grid_dims[0] * grid_dims[1] * grid_dims[2]
+    assert num_parallel_envs <= grid_capacity, f"Grid dimensions {grid_dims} can only hold {grid_capacity} envs, but {num_parallel_envs} were requested."
+
     env_for_training = CartPole(xml_model=xml_model, backend='mjx')
 
-    # b) The concatenated env for initializing the visualization scene.
-    concatenated_xml = concatenate_envs_xml(
-        xml_string=xml_model, num_envs=num_parallel_envs, env_separation=4.0, envs_per_row=4, base_body_name="cart"
+    concatenated_xml = WebViewerBatched.concatenate_envs_xml(
+        xml_string=xml_model, 
+        num_envs=num_parallel_envs, 
+        grid_dims=grid_dims, 
+        env_offset=env_offset_3d
     )
     env_for_visualization_init = CartPole(xml_model=concatenated_xml, backend='mjx')
 
-    # Instantiate and run the viewer
-    viewer = WebViewerBatched()
-    viewer.run()  # Start the web server in the background
+    # Instantiate the viewer, passing 3D layout info to the constructor.
+    viewer = WebViewerBatched(
+        grid_dims=grid_dims,
+        env_offset=env_offset_3d
+    )
+    viewer.run()
 
-    # Initialize the viewer with the concatenated scene.
     viewer.init(env_for_visualization_init)
 
     # --- 2. Training Process ---
 
-    # Define the PPO networks
     make_networks_factory = functools.partial(
         ppo_networks.make_ppo_networks,
         policy_hidden_layer_sizes=(64, 64, 64, 64),
     )
 
-    # Define the training function with parameters from your code.
     train_fn = functools.partial(
         ppo.train,
         num_timesteps=40000,
@@ -125,15 +136,13 @@ if __name__ == "__main__":
         entropy_cost=1e-2,
         network_factory=make_networks_factory,
         seed=0,
-        viewer=viewer,  # Hook the viewer into the training loop
+        viewer=viewer,
     )
 
-    # Define a progress callback function
     def progress_fn(current_step, metrics):
         if current_step > 0:
             print(f'Training Step: {current_step} \t Eval Reward: {metrics["eval/episode_reward"]:.3f}')
 
-    # Execute training.
     make_policy_fn, params, _ = train_fn(
         environment=env_for_training,
         eval_env=env_for_training,
@@ -142,7 +151,6 @@ if __name__ == "__main__":
 
     print("--- Training Complete ---")
 
-    # Keep the script running after training.
     try:
         while True:
             time.sleep(1)

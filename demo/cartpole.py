@@ -11,7 +11,7 @@ from brax.training.agents.ppo import networks as ppo_networks
 
 import functools
 
-from braxviewer.brax.training.agents.ppo import train as ppo
+from braxviewer.brax.brax.training.agents.ppo import train as ppo
 from braxviewer.WebViewer import WebViewer
 
 

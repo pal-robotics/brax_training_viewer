@@ -110,6 +110,17 @@ class Viewer {
     this.gui.domElement.style.position = 'absolute';
     this.gui.domElement.style.right = 0;
     this.gui.domElement.style.top = 0;
+    
+    // Add rendering toggle switch
+    this.rendering = { enabled: true };
+    const renderFolder = this.gui.addFolder('Real-time Rendering');
+    renderFolder.add(this.rendering, 'enabled').name('Enable')
+      .onChange((value) => {
+        if (window.control_ws) {
+            window.control_ws.send(JSON.stringify({ type: 'toggle_render', enabled: value }));
+        }
+      });
+    renderFolder.open();
 
     const cameraFolder = this.gui.addFolder('Camera');
     cameraFolder.add(this.camera, 'freezeAngle').name('Freeze Angle');
@@ -369,7 +380,6 @@ function setupLiveFrameWebSocket(system, viewer) {
     setFrameStatus('Connected', 'green');
   };
   ws.onmessage = (event) => {
-    console.log("Received frame:", event.data);
     handleFrame(event.data);
   };
   ws.onclose = () => {
@@ -384,6 +394,7 @@ function setupLiveFrameWebSocket(system, viewer) {
 
 function setupControlWebSocket(viewer) {
   const ws = new WebSocket(`ws://${window.location.host}/ws/control`);
+  window.control_ws = ws; // Make ws globally accessible for the GUI callback
 
   // Add status light for control WS
   const controlStatus = { status: 'Connecting' };
