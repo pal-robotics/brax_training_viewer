@@ -82,7 +82,7 @@ if __name__ == "__main__":
     
     # Define the 3D grid layout: (cols, rows, layers)
     # For a 2x2x2 cube:
-    grid_dims = (2, 2, 2)
+    grid_dims = (4, 2, 1)
     # For a flat 4x2 grid, use: grid_dims = (4, 2, 1)
     # For a vertical stack, use: grid_dims = (1, 1, 8)
     
