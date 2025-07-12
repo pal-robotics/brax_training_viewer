@@ -82,6 +82,14 @@ class WebSocketStreamer:
                 except queue.Empty:
                     break
         self._state_queue.put(state)
+    
+    def discard_queue(self):
+        """Discards all items in the state queue."""
+        while not self._state_queue.empty():
+            try:
+                self._state_queue.get_nowait()
+            except queue.Empty:
+                break
 
     def stop(self):
         """Stops the WebSocket thread safely."""

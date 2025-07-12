@@ -380,6 +380,7 @@ function setupLiveFrameWebSocket(system, viewer) {
     setFrameStatus('Connected', 'green');
   };
   ws.onmessage = (event) => {
+    console.log(event.data);
     handleFrame(event.data);
   };
   ws.onclose = () => {

@@ -13,9 +13,9 @@ from brax.envs.base import PipelineEnv, State
 
 # Import custom modules and brax training modules
 from braxviewer.WebViewerBatched import WebViewerBatched
-from braxviewer.brax.brax.training.agents.ppo import train as ppo
+from brax.training.agents.ppo import train as ppo
 from brax.training.agents.ppo import networks as ppo_networks
-
+from braxviewer.brax.brax.envs.wrappers.viewer import ViewerWrapper
 
 # ==============================================================================
 #  Environment Definition
@@ -112,6 +112,9 @@ if __name__ == "__main__":
 
     viewer.init(env_for_visualization_init)
 
+    env_for_training = ViewerWrapper(env=env_for_training, viewer=viewer)
+
+
     # --- 2. Training Process ---
 
     make_networks_factory = functools.partial(
@@ -136,7 +139,6 @@ if __name__ == "__main__":
         entropy_cost=1e-2,
         network_factory=make_networks_factory,
         seed=0,
-        viewer=viewer,
     )
 
     def progress_fn(current_step, metrics):

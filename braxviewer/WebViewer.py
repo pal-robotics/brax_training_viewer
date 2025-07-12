@@ -31,6 +31,7 @@ class WebViewer:
         
         # Add a state to control rendering. Default to True.
         self.rendering_enabled = True
+        self.discard_queue = True
 
         html_template_path = epath.resource_path('braxviewer') / 'static' / 'index.html'
         self.template = jinja2.Template(html_template_path.read_text())
@@ -230,8 +231,10 @@ class WebViewer:
         self.streamer.stop()
         self.log("Viewer and streamer stopped.")
 
-    def send_frame(self, state, discard_queue: bool = True):
-        self.streamer.send(state,discard_queue=discard_queue)
+    def send_frame(self, state):
+        self.streamer.send(state)
+        if self.discard_queue:
+            self.streamer.discard_queue()
 
     def log(self, message: str):
         self.logger.info(message)
