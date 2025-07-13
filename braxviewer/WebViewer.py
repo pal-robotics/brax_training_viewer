@@ -16,6 +16,7 @@ from brax.io import json
 from braxviewer.StateStreamer import StateStreamer
 import json as std_json
 import jax.numpy as jnp
+import jax.tree_util
 
 class WebViewer:
     def __init__(self,
@@ -23,7 +24,7 @@ class WebViewer:
                  port: int = 8000,
                  log_level: str = "info",
                  server_log_level: str = "warning",
-                 env: Optional[PipelineEnv] = None,):
+                 xml: str = None):
         self.host = host
         self.port = port
         
@@ -79,8 +80,8 @@ class WebViewer:
         self._setup_cors()
         self._setup_routes()
 
-        if env is not None:
-            self.init(env)
+        if xml is not None:
+            self.init(xml)
 
     def _setup_cors(self):
         self.app.add_middleware(
@@ -229,7 +230,7 @@ class WebViewer:
             <div class="container">
                 <h1>Viewer Not Initialized</h1>
                 <p>Waiting for the 3D scene to be generated from Python.</p>
-                <p>Please run <code>viewer.init(your_env)</code> in your script.</p>
+                <p>Please run <code>viewer.init(your_xml)</code> in your script.</p>
                 <div id="ws-status" class="status">Connecting to server...</div>
             </div>
             <script>
@@ -311,15 +312,27 @@ class WebViewer:
 
     def stop(self):
         self.streamer.stop()
-        self.log("Viewer and streamer stopped.")
 
     def send_frame(self, state):
         if not self.rendering_enabled:
             return
-        self.log("Frame received by viewer. Queueing for send.", type="debug")
-        self.streamer.send(state)
-        if self.discard_queue:
-            self.streamer.discard_queue()
+        
+        # Unbatch the state if it has a leading dimension of 1
+        if hasattr(state, 'pipeline_state') and hasattr(state.pipeline_state, 'q') and state.pipeline_state.q.ndim > 1:
+            state_to_render = jax.tree_util.tree_map(lambda x: x[0], state)
+        else:
+            state_to_render = state
+
+        pipeline_state = state_to_render.pipeline_state
+        
+        # Subsequent frames are state-only updates.
+        message = {
+            "x": {
+                "pos": pipeline_state.x.pos.tolist(),
+                "rot": pipeline_state.x.rot.tolist()
+            }
+        }
+        self.streamer.send(std_json.dumps(message))
 
     def log(self, message: str, type: str = "info"):
         if type == "info":

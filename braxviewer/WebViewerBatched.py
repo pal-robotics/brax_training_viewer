@@ -11,7 +11,7 @@ class WebViewerBatched(WebViewer):
                  grid_dims: tuple = None,
                  env_offset: tuple = None,
                  num_envs: int = None,
-                 original_xml: str = None,
+                 xml: str = None,
                  **kwargs):
         # Auto-calculate grid_dims if not provided
         grid_dims_auto_calculated = False
@@ -32,7 +32,7 @@ class WebViewerBatched(WebViewer):
         # Store configuration
         self.grid_dims = grid_dims
         self.num_envs = num_envs
-        self.original_xml = original_xml
+        self.xml = xml
         
         # Log grid_dims calculation after logger is available
         if grid_dims_auto_calculated:
@@ -40,7 +40,7 @@ class WebViewerBatched(WebViewer):
         
         # Auto-calculate env_offset if not provided
         if env_offset is None:
-            self.env_offset = self._auto_calculate_env_offset(original_xml)
+            self.env_offset = self._auto_calculate_env_offset(xml)
             self.log(f"Auto-calculated env_offset: {self.env_offset}")
         else:
             self.env_offset = env_offset
@@ -48,13 +48,14 @@ class WebViewerBatched(WebViewer):
         
         # Automatically concatenate the XML for visualization using num_envs
         self.concatenated_xml = self._concatenate_envs_xml(
-            xml_string=original_xml,
+            xml_string=xml,
             num_envs=num_envs,
             grid_dims=grid_dims,
             env_offset=self.env_offset
         )
         
         self.streamer.unbatched = False
+        self.init()
 
     def _auto_calculate_grid_dims(self, num_envs: int) -> tuple:
         """

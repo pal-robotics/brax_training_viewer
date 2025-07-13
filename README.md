@@ -14,136 +14,139 @@ As this tool extends the official Brax PPO training function, it ensures seamles
 * **Support Parallel Environments**: The viewer will visualize multiple parallel agents, reflecting the exact training conditions in Brax.
 * **Allow Enable/Disable Rendering**: Since the copy process from GPU to CPU slows down the training process, users can dynamically enable or disable the data transfer to have high-speed training without visual feedback or keep visualization synchronized at the cost of slower training.
 
-## Usage Conda
+## Installation and Setup
 
+### Conda
 -   (Optionally) install Python virtual environment [conda](https://www.anaconda.com/docs/getting-started/miniconda/main)
--   (Optionally) creat a virtual environment `conda create -n test python=3.10`
+-   (Optionally) create a virtual environment `conda create -n test python=3.10`
 -   `conda activate test`
 -   `cd` to the root folder of this repo
+-   run `git submodule update --init --recursive`
 -   run `pip install .`
 -   run `pip install -r requirements.txt `
--   (Optionally) install Jax in hardware accelaration version `pip install -U "jax[cuda12]"` or `pip install -U "jax[cuda11]"` or `pip install -U "jax[tpu]"`
--   you can try examples in `demo/` folder. For example, `python demo/cartpole.py`
--   open a web browser, go to page `http://127.0.0.1:8000/` for the viewer
+-   (Optionally) install Jax with hardware acceleration: `pip install -U "jax[cuda12]"` or `pip install -U "jax[cuda11]"` or `pip install -U "jax[tpu]"`
+-   You can try the examples in the `demo/` folder, for example: `python demo/cartpole.py`
+-   Open a web browser and go to `http://127.0.0.1:8000/` for the viewer.
 
-## Usage UV
-
+### UV
 [UV](https://github.com/astral-sh/uv) is an extremely fast Python package installer and resolver, written in Rust.
-
+-   `cd` to the root folder of this repo
+-   run `git submodule update --init --recursive`
 -   Install uv `pip install uv`
 -   Create a virtual environment `uv venv`
 -   Activate the virtual environment `source .venv/bin/activate`
 -   Install dependencies `uv pip install -r requirements.txt`
 -   Install the project `uv pip install .`
--   You can try the examples provided in the `demo/` folder. For instance, run `python demo/training_example.py`
+-   You can try the examples provided in the `demo/` folder, for instance: `python demo/training_example.py`
 -   Open a web browser and navigate to `http://127.0.0.1:8000/` to see the viewer.
 
-## How to use
+## How to Use
 
-Integrating the viewer into your existing Brax training script is straightforward. The core idea is to instantiate the viewer, run it, initialize it with your environment, and pass it to the training function.
+Integrating the viewer into your existing Brax training script is straightforward. The core idea is to instantiate the appropriate viewer, wrap your training environment with `ViewerWrapper`, and then pass the wrapped environment to the training function.
 
 ### For a Single Environment Visualization
 
-This is the simplest use case, ideal for standard Brax environments. The following example demonstrates how to visualize a `humanoid` agent.
+This is the simplest use case, ideal for standard Brax environments. The following example demonstrates how to visualize a generic agent.
 
 1.  **Import necessary modules**:
     ```python
-    from brax import envs
     from braxviewer.WebViewer import WebViewer
+    from braxviewer.brax.brax.envs.wrappers.viewer import ViewerWrapper
     from braxviewer.brax.brax.training.agents.ppo import train as ppo
+    from brax.training.agents.ppo import networks as ppo_networks
+    # from your_project import YourBraxEnvironment # Import your custom env
     ```
 
-2.  **Create the Viewer and Environment**:
+2.  **Create the Viewer and Wrap the Environment**:
     ```python
-    # Instantiate the viewer
-    viewer = WebViewer()
-    
-    # Start the viewer server in the background
+    # Load your robot's XML model string. Examples can be found in the
+    # official Brax repository: https://github.com/google/brax/tree/main/brax/envs/assets
+    xml_model = "..." 
+
+    # Instantiate the viewer and run it in the background
+    viewer = WebViewer(xml=xml_model)
     viewer.run()
 
-    # Get a standard Brax environment
-    env = envs.get_environment(env_name='humanoid', backend='positional')
+    # Create an instance of your custom Brax environment
+    env_for_evaluation = YourBraxEnvironment(xml_model=xml_model)
 
-    # Initialize the viewer with the environment structure
-    viewer.init(env)
+    # Wrap the environment to link it with the viewer
+    env_for_training = ViewerWrapper(env=env_for_evaluation, viewer=viewer)
     ```
 
-3.  **Pass Viewer to the Training Function**:
-    Modify your `train_fn` to accept the `viewer` object.
+3.  **Call the Training Function**:
+    Directly call the `ppo.train` function with the wrapped environment and other training parameters.
 
     ```python
-    # Get the training function for the 'humanoid' environment
-    train_fn = ... # Your functools.partial or direct call to ppo.train
+    # Define the PPO network
+    make_networks_factory = ppo_networks.make_ppo_networks
 
-    # Pass the viewer instance to the train function
-    make_inference_fn, params, _ = train_fn(
-        environment=env,
-        viewer=viewer
+    # Call the training function directly
+    make_policy_fn, params, _ = ppo.train(
+        environment=env_for_training,
+        eval_env=env_for_evaluation, # Use the original env for evaluation
+        num_timesteps=40000,
+        episode_length=300,
+        num_envs=1, # Single environment
+        normalize_observations=True,
+        network_factory=make_networks_factory
+        # ... add other ppo parameters as needed
     )
     ```
 
 ### For Batched (Parallel) Environment Visualization
 
-To visualize multiple environments running in parallel, use `WebViewerBatched`. This viewer arranges the agents in a 3D grid. The following example is based on `cartpole_batched.py`.
+To visualize multiple environments running in parallel, use `WebViewerBatched`. This viewer automatically handles the arrangement of agents in a 3D grid.
 
 1.  **Import modules**:
     ```python
     from braxviewer.WebViewerBatched import WebViewerBatched
+    from braxviewer.brax.brax.envs.wrappers.viewer import ViewerWrapper
     from braxviewer.brax.brax.training.agents.ppo import train as ppo
-    # Your custom environment class, e.g., CartPole
+    from brax.training.agents.ppo import networks as ppo_networks
+    # from your_project import YourBraxEnvironment # Import your custom env
     ```
 
-2.  **Define Grid and Create Viewer**:
-    `WebViewerBatched` requires information about the grid layout.
+2.  **Create the Batched Viewer and Wrap the Environment**:
+    `WebViewerBatched` only needs the number of environments and the base model XML.
 
     ```python
     num_parallel_envs = 8
-    grid_dims = (4, 2, 1)  # 4 columns, 2 rows, 1 layer
-    env_offset = (4.0, 4.0, 2.0) # Spacing between envs in (x, y, z)
-
-    # Instantiate the batched viewer with grid info
-    viewer = WebViewerBatched(
-        grid_dims=grid_dims,
-        env_offset=env_offset
-    )
-    viewer.run()
-    ```
-
-3.  **Prepare a Concatenated Environment for Visualization**:
-    The viewer needs a single large environment definition that contains all parallel agents.
-
-    ```python
-    # The original xml model for a single cartpole
+    
+    # Load your robot's XML model string. Examples can be found in the
+    # official Brax repository: https://github.com/google/brax/tree/main/brax/envs/assets
     xml_model = "..." 
 
-    # Create a concatenated XML string for all envs
-    concatenated_xml = WebViewerBatched.concatenate_envs_xml(
-        xml_string=xml_model, 
-        num_envs=num_parallel_envs, 
-        grid_dims=grid_dims, 
-        env_offset=env_offset
+    # Instantiate the batched viewer with the number of envs and the model
+    viewer = WebViewerBatched(
+        num_envs=num_parallel_envs,
+        xml=xml_model
     )
+    viewer.run()
 
-    # Create a temporary environment instance from this big XML for initialization
-    env_for_visualization_init = CartPole(xml_model=concatenated_xml)
+    # Create an instance of your custom Brax environment
+    env_for_evaluation = YourBraxEnvironment(xml_model=xml_model)
 
-    # Initialize the viewer with the concatenated environment
-    viewer.init(env_for_visualization_init)
+    # Wrap the environment to link it with the viewer
+    env_for_training = ViewerWrapper(env=env_for_evaluation, viewer=viewer)
     ```
 
-4.  **Train on the Original Environment**:
-    The actual training still happens on the original, single-agent environment class. Brax's training function handles the parallelization internally.
+3.  **Call the Training Function**:
+    The training happens on the original environment definition. The `ViewerWrapper` and Brax's training function handle the parallelization and visualization.
 
     ```python
-    # Training uses the original, single environment definition
-    env_for_training = CartPole(xml_model=xml_model)
-
-    train_fn = functools.partial(
-        ppo.train,
+    # Define the PPO network
+    make_networks_factory = ppo_networks.make_ppo_networks
+    
+    # Call the training function directly
+    make_policy_fn, params, _ = ppo.train(
+        environment=env_for_training,
+        eval_env=env_for_evaluation,
         num_envs=num_parallel_envs,
-        viewer=viewer,
-        # ... other ppo parameters
+        num_timesteps=40000,
+        episode_length=300,
+        normalize_observations=True,
+        network_factory=make_networks_factory
+        # ... add other ppo parameters as needed
     )
-
-    train_fn(environment=env_for_training)
     ```

@@ -95,11 +95,11 @@ class CartPole(PipelineEnv):
 if __name__ == '__main__':
   # Create and run the viewer.
   viewer = WebViewer(
+      xml=xml_model,
       port=8000,
       host='127.0.0.1',
   )
   viewer.run()
-  viewer.init(xml_string=xml_model)
 
   # Create the environments.
   env_for_evaluation = CartPole(xml_model=xml_model, backend='mjx')

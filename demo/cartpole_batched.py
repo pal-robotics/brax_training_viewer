@@ -99,14 +99,13 @@ if __name__ == '__main__':
   env_for_evaluation = CartPole(xml_model=xml_model, backend='mjx')
   viewer = WebViewerBatched(
       num_envs=num_parallel_envs,
-      original_xml=xml_model,
+      xml=xml_model,
       port=8000,
       host='127.0.0.1',
   )
   viewer.run()
 
   # Initialize viewer with concatenated XML.
-  viewer.init()
 
   env_for_training = ViewerWrapper(env=env_for_evaluation, viewer=viewer)
 
