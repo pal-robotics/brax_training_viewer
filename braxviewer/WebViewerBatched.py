@@ -1,6 +1,7 @@
 import jax.numpy as jnp
 import xml.etree.ElementTree as ET
 import json as std_json
+import math
 from brax.envs.base import PipelineEnv, State
 
 from braxviewer.WebViewer import WebViewer
@@ -8,9 +9,9 @@ from braxviewer.WebViewer import WebViewer
 class WebViewerBatched(WebViewer):
     def __init__(self,
                  grid_dims: tuple,
-                 env_offset: tuple,
-                 num_envs: int,
-                 original_xml: str,
+                 env_offset: tuple = None,
+                 num_envs: int = None,
+                 original_xml: str = None,
                  **kwargs):
         # Validate that the grid dimensions can hold all environments
         grid_capacity = grid_dims[0] * grid_dims[1] * grid_dims[2]
@@ -19,19 +20,164 @@ class WebViewerBatched(WebViewer):
         
         super().__init__(**kwargs)
         self.grid_dims = grid_dims
-        self.env_offset = env_offset
         self.num_envs = num_envs
         self.original_xml = original_xml
+        
+        # Auto-calculate env_offset if not provided
+        if env_offset is None:
+            self.env_offset = self._auto_calculate_env_offset(original_xml)
+            print(f"Auto-calculated env_offset: {self.env_offset}")
+        else:
+            self.env_offset = env_offset
+            print(f"Using provided env_offset: {self.env_offset}")
         
         # Automatically concatenate the XML for visualization using num_envs
         self.concatenated_xml = self._concatenate_envs_xml(
             xml_string=original_xml,
             num_envs=num_envs,
             grid_dims=grid_dims,
-            env_offset=env_offset
+            env_offset=self.env_offset
         )
         
         self.streamer.unbatched = False
+
+    def _auto_calculate_env_offset(self, xml_string: str) -> tuple:
+        """Auto-calculate environment offset based on XML bounding box."""
+        if not xml_string:
+            return (4.0, 4.0, 2.0)  # Default fallback
+        
+        try:
+            bbox = self._calculate_xml_bounding_box(xml_string)
+            print(f"Calculated bounding box: {bbox}")
+            
+            # Add some padding (50% of the size)
+            padding_factor = 1.5
+            x_size = (bbox['max_x'] - bbox['min_x']) * padding_factor
+            y_size = (bbox['max_y'] - bbox['min_y']) * padding_factor
+            z_size = (bbox['max_z'] - bbox['min_z']) * padding_factor
+            
+            print(f"Raw sizes with padding: x={x_size:.3f}, y={y_size:.3f}, z={z_size:.3f}")
+            
+            # Ensure minimum spacing
+            min_spacing = 2.0
+            x_offset = max(x_size, min_spacing)
+            y_offset = max(y_size, min_spacing)
+            z_offset = max(z_size, min_spacing)
+            
+            return (x_offset, y_offset, z_offset)
+        except Exception as e:
+            print(f"Warning: Failed to auto-calculate env_offset: {e}")
+            return (4.0, 4.0, 2.0)  # Default fallback
+
+    def _calculate_xml_bounding_box(self, xml_string: str) -> dict:
+        """Calculate bounding box from XML geometry elements."""
+        tree = ET.ElementTree(ET.fromstring(xml_string))
+        root = tree.getroot()
+        
+        min_x = min_y = min_z = float('inf')
+        max_x = max_y = max_z = float('-inf')
+        
+        def update_bounds(pos, size_info):
+            """Update bounding box with position and size information."""
+            nonlocal min_x, min_y, min_z, max_x, max_y, max_z
+            
+            x, y, z = pos
+            dx, dy, dz = size_info
+            
+            min_x = min(min_x, x - dx)
+            max_x = max(max_x, x + dx)
+            min_y = min(min_y, y - dy)
+            max_y = max(max_y, y + dy)
+            min_z = min(min_z, z - dz)
+            max_z = max(max_z, z + dz)
+        
+        def parse_position(pos_str):
+            """Parse position string to floats."""
+            if not pos_str:
+                return [0.0, 0.0, 0.0]
+            return [float(x) for x in pos_str.split()]
+        
+        def calculate_geom_bounds(geom, parent_pos=[0, 0, 0]):
+            """Calculate bounds for a geometry element."""
+            geom_type = geom.get('type', 'box')
+            pos = parse_position(geom.get('pos', '0 0 0'))
+            
+            # Add parent position offset
+            pos = [pos[i] + parent_pos[i] for i in range(3)]
+            
+            if geom_type == 'box':
+                size = parse_position(geom.get('size', '0.1 0.1 0.1'))
+                update_bounds(pos, size)
+            
+            elif geom_type == 'sphere':
+                radius = float(geom.get('size', '0.1').split()[0])
+                update_bounds(pos, [radius, radius, radius])
+            
+            elif geom_type == 'capsule':
+                fromto = geom.get('fromto')
+                if fromto:
+                    # Parse fromto: "x1 y1 z1 x2 y2 z2"
+                    coords = [float(x) for x in fromto.split()]
+                    p1 = coords[:3]
+                    p2 = coords[3:]
+                    radius = float(geom.get('size', '0.1').split()[0])
+                    
+                    # Update bounds for both endpoints plus radius
+                    update_bounds([p1[i] + parent_pos[i] for i in range(3)], [radius, radius, radius])
+                    update_bounds([p2[i] + parent_pos[i] for i in range(3)], [radius, radius, radius])
+                else:
+                    # Regular capsule with size
+                    size_str = geom.get('size', '0.1 0.1')
+                    size_parts = size_str.split()
+                    radius = float(size_parts[0])
+                    length = float(size_parts[1]) if len(size_parts) > 1 else radius
+                    update_bounds(pos, [radius, radius, length])
+            
+            elif geom_type == 'plane':
+                size = parse_position(geom.get('size', '10 10 0.1'))
+                update_bounds(pos, size)
+            
+            elif geom_type == 'cylinder':
+                size_str = geom.get('size', '0.1 0.1')
+                size_parts = size_str.split()
+                radius = float(size_parts[0])
+                height = float(size_parts[1]) if len(size_parts) > 1 else radius
+                update_bounds(pos, [radius, radius, height])
+        
+        def traverse_body(body, parent_pos=[0, 0, 0]):
+            """Recursively traverse body elements."""
+            body_pos = parse_position(body.get('pos', '0 0 0'))
+            current_pos = [body_pos[i] + parent_pos[i] for i in range(3)]
+            
+            # Process geoms in this body
+            for geom in body.findall('geom'):
+                calculate_geom_bounds(geom, current_pos)
+            
+            # Recursively process child bodies
+            for child_body in body.findall('body'):
+                traverse_body(child_body, current_pos)
+        
+        # Start traversal from worldbody
+        worldbody = root.find('worldbody')
+        if worldbody is not None:
+            # Process direct geoms in worldbody
+            for geom in worldbody.findall('geom'):
+                calculate_geom_bounds(geom)
+            
+            # Process all bodies
+            for body in worldbody.findall('body'):
+                traverse_body(body)
+        
+        # If no geometries were found, use defaults
+        if min_x == float('inf'):
+            min_x = min_y = min_z = -1.0
+            max_x = max_y = max_z = 1.0
+        
+        return {
+            'min_x': min_x, 'max_x': max_x,
+            'min_y': min_y, 'max_y': max_y,
+            'min_z': min_z, 'max_z': max_z
+        }
 
     def init(self, xml_string: str = None, backend: str = 'mjx'):
         """Initialize the viewer with XML string. If not provided, uses the concatenated XML."""

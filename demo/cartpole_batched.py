@@ -86,15 +86,17 @@ if __name__ == "__main__":
     # For a flat 4x2 grid, use: grid_dims = (4, 2, 1)
     # For a vertical stack, use: grid_dims = (1, 1, 8)
     
-    # Define the spacing for each grid cell
-    env_offset_3d = (4.0, 4.0, 2.0)
+    # env_offset will be automatically calculated based on XML bounding box
+    # If you want to override the auto-calculation, uncomment the line below:
+    # env_offset_3d = (4.0, 4.0, 2.0)
 
     env_for_evaluation = CartPole(xml_model=xml_model, backend='mjx')
 
     # Instantiate the viewer with automatic XML concatenation
+    # env_offset is now optional and will be auto-calculated if not provided
     viewer = WebViewerBatched(
         grid_dims=grid_dims,
-        env_offset=env_offset_3d,
+        # env_offset=env_offset_3d,  # This line is commented out to test auto-calculation
         num_envs=num_parallel_envs,
         original_xml=xml_model,
         port=8080,
