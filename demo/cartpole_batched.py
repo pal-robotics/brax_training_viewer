@@ -89,32 +89,23 @@ if __name__ == "__main__":
     # Define the spacing for each grid cell
     env_offset_3d = (4.0, 4.0, 2.0)
 
-    # Ensure the grid dimensions can hold all environments
-    grid_capacity = grid_dims[0] * grid_dims[1] * grid_dims[2]
-    assert num_parallel_envs <= grid_capacity, f"Grid dimensions {grid_dims} can only hold {grid_capacity} envs, but {num_parallel_envs} were requested."
+    env_for_evaluation = CartPole(xml_model=xml_model, backend='mjx')
 
-    env_for_training = CartPole(xml_model=xml_model, backend='mjx')
-
-    concatenated_xml = WebViewerBatched.concatenate_envs_xml(
-        xml_string=xml_model, 
-        num_envs=num_parallel_envs, 
-        grid_dims=grid_dims, 
-        env_offset=env_offset_3d
-    )
-    env_for_visualization_init = CartPole(xml_model=concatenated_xml, backend='mjx')
-
-    # Instantiate the viewer, passing 3D layout info to the constructor.
+    # Instantiate the viewer with automatic XML concatenation
     viewer = WebViewerBatched(
         grid_dims=grid_dims,
         env_offset=env_offset_3d,
+        num_envs=num_parallel_envs,
+        original_xml=xml_model,
         port=8080,
         host='127.0.0.1'
     )
     viewer.run()
 
-    viewer.init(env_for_visualization_init)
+    # Initialize viewer with concatenated XML (automatic)
+    viewer.init()
 
-    env_for_training_wrapped = ViewerWrapper(env=env_for_training, viewer=viewer)
+    env_for_training = ViewerWrapper(env=env_for_evaluation, viewer=viewer)
 
 
     # --- 2. Training Process ---
@@ -148,8 +139,8 @@ if __name__ == "__main__":
             print(f'Training Step: {current_step} \t Eval Reward: {metrics["eval/episode_reward"]:.3f}')
 
     make_policy_fn, params, _ = train_fn(
-        environment=env_for_training_wrapped,
-        eval_env=env_for_training,
+        environment=env_for_training,
+        eval_env=env_for_evaluation,
         progress_fn=progress_fn,
     )
 

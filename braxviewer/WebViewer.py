@@ -15,6 +15,7 @@ import jinja2
 from brax.io import json
 from braxviewer.WebSocketStreamer import WebSocketStreamer
 import json as std_json
+import jax.numpy as jnp
 
 class WebViewer:
     def __init__(self,
@@ -101,14 +102,57 @@ class WebViewer:
                 self.clients_control.remove(websocket)
 
 
-    def init(self, env: PipelineEnv):
-        self.env = env
-        from jax import random as jax_random
-        rng = jax_random.PRNGKey(0)
-        state = env.reset(rng)
+    def init(self, xml_string: str, backend: str = 'mjx'):
+        """Initialize the viewer with XML string instead of environment object."""
+        from braxviewer.brax.brax.io import mjcf
+        from braxviewer.brax.brax.envs.base import PipelineEnv
         
-        sys_with_dt = env.sys.tree_replace({'opt.timestep': env.dt})
-        self.system_json = json.dumps(sys_with_dt, [state.pipeline_state])
+        # Create a temporary environment from XML to extract system info
+        sys = mjcf.loads(xml_string)
+        
+        # Create a minimal PipelineEnv-like object with the system info we need
+        class TempEnv:
+            def __init__(self, sys):
+                self.sys = sys
+                self.dt = sys.opt.timestep
+                
+            def reset(self, rng):
+                from braxviewer.brax.brax.envs.base import State
+                q = jnp.zeros((self.sys.q_size(),))
+                qd = jnp.zeros((self.sys.qd_size(),))
+                pipeline_state = self.pipeline_init(q, qd)
+                return State(pipeline_state=pipeline_state, obs=None, reward=None, done=None)
+                
+            def pipeline_init(self, q, qd):
+                from braxviewer.brax.brax.positional import pipeline as positional_pipeline
+                from braxviewer.brax.brax.spring import pipeline as spring_pipeline
+                from braxviewer.brax.brax.generalized import pipeline as generalized_pipeline
+                
+                # Try different pipeline types based on the system
+                try:
+                    return positional_pipeline.init(self.sys, q, qd)
+                except:
+                    try:
+                        return spring_pipeline.init(self.sys, q, qd)
+                    except:
+                        return generalized_pipeline.init(self.sys, q, qd)
+        
+        self.env = TempEnv(sys)
+        
+        from jax import random as jax_random
+        from brax.io import json
+        rng = jax_random.PRNGKey(0)
+        pipeline_state_to_serialize = None
+        try:
+            env_state = self.env.reset(rng)
+            pipeline_state_to_serialize = env_state.pipeline_state
+        except Exception:
+            q = jnp.zeros((self.env.sys.q_size(),))
+            qd = jnp.zeros((self.env.sys.qd_size(),))
+            pipeline_state_to_serialize = self.env.pipeline_init(q, qd)
+        
+        sys_with_dt = self.env.sys.tree_replace({'opt.timestep': self.env.dt})
+        self.system_json = json.dumps(sys_with_dt, [pipeline_state_to_serialize])
 
         self.send_control({"type": "refresh_web"})
         

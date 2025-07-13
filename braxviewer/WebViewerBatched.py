@@ -9,14 +9,70 @@ class WebViewerBatched(WebViewer):
     def __init__(self,
                  grid_dims: tuple,
                  env_offset: tuple,
+                 num_envs: int,
+                 original_xml: str,
                  **kwargs):
+        # Validate that the grid dimensions can hold all environments
+        grid_capacity = grid_dims[0] * grid_dims[1] * grid_dims[2]
+        if num_envs > grid_capacity:
+            raise ValueError(f"Grid dimensions {grid_dims} can only hold {grid_capacity} envs, but {num_envs} were requested.")
+        
         super().__init__(**kwargs)
         self.grid_dims = grid_dims
         self.env_offset = env_offset
+        self.num_envs = num_envs
+        self.original_xml = original_xml
+        
+        # Automatically concatenate the XML for visualization using num_envs
+        self.concatenated_xml = self._concatenate_envs_xml(
+            xml_string=original_xml,
+            num_envs=num_envs,
+            grid_dims=grid_dims,
+            env_offset=env_offset
+        )
+        
         self.streamer.unbatched = False
 
-    def init(self, env_concatenated: PipelineEnv):
-        self.env = env_concatenated
+    def init(self, xml_string: str = None, backend: str = 'mjx'):
+        """Initialize the viewer with XML string. If not provided, uses the concatenated XML."""
+        if xml_string is None:
+            xml_string = self.concatenated_xml
+            
+        from braxviewer.brax.brax.io import mjcf
+        from braxviewer.brax.brax.envs.base import PipelineEnv
+        
+        # Create a temporary environment from XML to extract system info
+        sys = mjcf.loads(xml_string)
+        
+        # Create a minimal PipelineEnv-like object with the system info we need
+        class TempEnv:
+            def __init__(self, sys):
+                self.sys = sys
+                self.dt = sys.opt.timestep
+                
+            def reset(self, rng):
+                from braxviewer.brax.brax.envs.base import State
+                q = jnp.zeros((self.sys.q_size(),))
+                qd = jnp.zeros((self.sys.qd_size(),))
+                pipeline_state = self.pipeline_init(q, qd)
+                return State(pipeline_state=pipeline_state, obs=None, reward=None, done=None)
+                
+            def pipeline_init(self, q, qd):
+                from braxviewer.brax.brax.positional import pipeline as positional_pipeline
+                from braxviewer.brax.brax.spring import pipeline as spring_pipeline
+                from braxviewer.brax.brax.generalized import pipeline as generalized_pipeline
+                
+                # Try different pipeline types based on the system
+                try:
+                    return positional_pipeline.init(self.sys, q, qd)
+                except:
+                    try:
+                        return spring_pipeline.init(self.sys, q, qd)
+                    except:
+                        return generalized_pipeline.init(self.sys, q, qd)
+        
+        self.env = TempEnv(sys)
+        
         from jax import random as jax_random
         from brax.io import json
         rng = jax_random.PRNGKey(0)
@@ -123,7 +179,7 @@ class WebViewerBatched(WebViewer):
         return batched_state.replace(pipeline_state=stitched_pipeline_state)
 
     @staticmethod
-    def concatenate_envs_xml(xml_string: str, num_envs: int, grid_dims: tuple, env_offset: tuple) -> str:
+    def _concatenate_envs_xml(xml_string: str, num_envs: int, grid_dims: tuple, env_offset: tuple) -> str:
         """
         Duplicates all top-level elements from <worldbody> for each environment,
         and applies the grid offset to each duplicated element's position.
