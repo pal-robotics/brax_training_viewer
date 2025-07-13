@@ -14,7 +14,7 @@ import logging
 import jinja2
 from brax.io import json
 from braxviewer.WebSocketStreamer import WebSocketStreamer
-import json as std_json # For control messages
+import json as std_json
 
 class WebViewer:
     def __init__(self,

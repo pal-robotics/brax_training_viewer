@@ -1,6 +1,6 @@
-import jax
 import jax.numpy as jnp
 import xml.etree.ElementTree as ET
+import json as std_json
 from brax.envs.base import PipelineEnv, State
 
 from braxviewer.WebViewer import WebViewer
@@ -32,9 +32,57 @@ class WebViewerBatched(WebViewer):
         self.system_json = json.dumps(sys_with_dt, [pipeline_state_to_serialize])
         self.send_control({"type": "refresh_web"})
 
-    def send_frame(self, state):
-        stitched = self.stitch_state(state)
-        self.streamer.send(stitched, discard_queue=True)
+    def send_frame(self, state: State):
+        """Prepares and sends a single frame from one of the batched environments."""
+        if self.streamer is None:
+            return
+
+        # Extract env_id from state.info. If not present, default to 0.
+        # This handles cases where we might be viewing a single, non-batched env.
+        env_id = state.info.get('env_id', 0)
+        
+        # If env_id is a JAX array, convert it to a Python int.
+        if hasattr(env_id, 'item'):
+            env_id = env_id.item()
+
+        # Calculate the offset for this specific environment based on grid layout
+        cols, rows, _ = self.grid_dims
+        envs_per_layer = cols * rows
+        
+        layer = env_id // envs_per_layer
+        idx_in_layer = env_id % envs_per_layer
+        row = idx_in_layer // cols
+        col = idx_in_layer % cols
+        
+        x_offset = col * self.env_offset[0]
+        y_offset = row * self.env_offset[1]
+        z_offset = layer * self.env_offset[2]
+        
+        # Convert JAX arrays to lists for robust JSON serialization.
+        pos_list = state.pipeline_state.x.pos.tolist()
+        rot_list = state.pipeline_state.x.rot.tolist()
+        
+        # Apply the offset to each position
+        offset_pos_list = []
+        for pos in pos_list:
+            offset_pos = [
+                pos[0] + x_offset,
+                pos[1] + y_offset,
+                pos[2] + z_offset
+            ]
+            offset_pos_list.append(offset_pos)
+
+        frame = {
+            'x': {
+                'pos': offset_pos_list,
+                'rot': rot_list,
+            },
+            'env_id': env_id,
+        }
+        
+        # Serialize the frame to JSON here and send the string.
+        frame_json = std_json.dumps(frame)
+        self.streamer.send(frame_json, discard_queue=True)
 
     def stitch_state(self, batched_state: State) -> State:
         if not hasattr(batched_state, 'pipeline_state') or batched_state.pipeline_state.q.ndim < 2:

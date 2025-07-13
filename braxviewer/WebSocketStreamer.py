@@ -2,7 +2,6 @@ import asyncio
 import threading
 import queue
 import json as std_json
-import time
 import websockets
 
 from braxviewer.utils import state_to_dict
@@ -44,16 +43,21 @@ class WebSocketStreamer:
                 async with websockets.connect(self.uri) as ws:
                     # print("[WebSocket] Streamer connected.")
                     while True:
-                        # Get a state from the synchronous queue in a non-blocking way.
-                        state = await loop.run_in_executor(None, self._state_queue.get)
-                        if state is None:  # Sentinel value to stop the loop.
+                        # Get an item from the synchronous queue in a non-blocking way.
+                        item = await loop.run_in_executor(None, self._state_queue.get)
+                        if item is None:  # Sentinel value to stop the loop.
                             return
 
                         try:
-                            # Run the CPU-bound serialization in a thread pool executor.
-                            frame_json = await loop.run_in_executor(
-                                None, self._serialize_frame, state
-                            )
+                            frame_json = ""
+                            if isinstance(item, str):
+                                # If the item is already a JSON string, use it directly.
+                                frame_json = item
+                            else:
+                                # Otherwise, serialize the state object as before.
+                                frame_json = await loop.run_in_executor(
+                                    None, self._serialize_frame, item
+                                )
                             await ws.send(frame_json)
                         except Exception as e:
                             # print(f"[WebSocket] Failed to send frame: {e}")

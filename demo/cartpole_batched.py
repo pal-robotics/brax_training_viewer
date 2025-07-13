@@ -8,12 +8,12 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 
 import jax
 import jax.numpy as jnp
-from brax.io import mjcf
-from brax.envs.base import PipelineEnv, State
+from braxviewer.brax.brax.io import mjcf
+from braxviewer.brax.brax.envs.base import PipelineEnv, State
 
 # Import custom modules and brax training modules
 from braxviewer.WebViewerBatched import WebViewerBatched
-from brax.training.agents.ppo import train as ppo
+from braxviewer.brax.brax.training.agents.ppo import train as ppo
 from brax.training.agents.ppo import networks as ppo_networks
 from braxviewer.brax.brax.envs.wrappers.viewer import ViewerWrapper
 
@@ -106,13 +106,15 @@ if __name__ == "__main__":
     # Instantiate the viewer, passing 3D layout info to the constructor.
     viewer = WebViewerBatched(
         grid_dims=grid_dims,
-        env_offset=env_offset_3d
+        env_offset=env_offset_3d,
+        port=8080,
+        host='127.0.0.1'
     )
     viewer.run()
 
     viewer.init(env_for_visualization_init)
 
-    env_for_training = ViewerWrapper(env=env_for_training, viewer=viewer)
+    env_for_training_wrapped = ViewerWrapper(env=env_for_training, viewer=viewer)
 
 
     # --- 2. Training Process ---
@@ -146,7 +148,7 @@ if __name__ == "__main__":
             print(f'Training Step: {current_step} \t Eval Reward: {metrics["eval/episode_reward"]:.3f}')
 
     make_policy_fn, params, _ = train_fn(
-        environment=env_for_training,
+        environment=env_for_training_wrapped,
         eval_env=env_for_training,
         progress_fn=progress_fn,
     )
