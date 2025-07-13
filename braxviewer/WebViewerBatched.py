@@ -8,28 +8,43 @@ from braxviewer.WebViewer import WebViewer
 
 class WebViewerBatched(WebViewer):
     def __init__(self,
-                 grid_dims: tuple,
+                 grid_dims: tuple = None,
                  env_offset: tuple = None,
                  num_envs: int = None,
                  original_xml: str = None,
                  **kwargs):
+        # Auto-calculate grid_dims if not provided
+        grid_dims_auto_calculated = False
+        if grid_dims is None:
+            if num_envs is None:
+                raise ValueError("num_envs must be provided when grid_dims is not specified")
+            grid_dims = self._auto_calculate_grid_dims(num_envs)
+            grid_dims_auto_calculated = True
+        
         # Validate that the grid dimensions can hold all environments
         grid_capacity = grid_dims[0] * grid_dims[1] * grid_dims[2]
         if num_envs > grid_capacity:
             raise ValueError(f"Grid dimensions {grid_dims} can only hold {grid_capacity} envs, but {num_envs} were requested.")
         
+        # Initialize parent class first to set up logger
         super().__init__(**kwargs)
+        
+        # Store configuration
         self.grid_dims = grid_dims
         self.num_envs = num_envs
         self.original_xml = original_xml
         
+        # Log grid_dims calculation after logger is available
+        if grid_dims_auto_calculated:
+            self.log(f"Auto-calculated grid_dims: {grid_dims}")
+        
         # Auto-calculate env_offset if not provided
         if env_offset is None:
             self.env_offset = self._auto_calculate_env_offset(original_xml)
-            print(f"Auto-calculated env_offset: {self.env_offset}")
+            self.log(f"Auto-calculated env_offset: {self.env_offset}")
         else:
             self.env_offset = env_offset
-            print(f"Using provided env_offset: {self.env_offset}")
+            self.log(f"Using provided env_offset: {self.env_offset}")
         
         # Automatically concatenate the XML for visualization using num_envs
         self.concatenated_xml = self._concatenate_envs_xml(
@@ -41,6 +56,19 @@ class WebViewerBatched(WebViewer):
         
         self.streamer.unbatched = False
 
+    def _auto_calculate_grid_dims(self, num_envs: int) -> tuple:
+        """
+        Auto-calculate grid dimensions for the given number of environments.
+        Default layer is 1, col and row should be similar, and col * row >= num_envs.
+        """
+        if num_envs <= 0:
+            return (1, 1, 1)
+        
+        # Calculate square root and round up to get grid dimensions
+        grid_size = math.ceil(math.sqrt(num_envs))
+        
+        return (grid_size, grid_size, 1)
+
     def _auto_calculate_env_offset(self, xml_string: str) -> tuple:
         """Auto-calculate environment offset based on XML bounding box."""
         if not xml_string:
@@ -48,7 +76,7 @@ class WebViewerBatched(WebViewer):
         
         try:
             bbox = self._calculate_xml_bounding_box(xml_string)
-            print(f"Calculated bounding box: {bbox}")
+            self.log(f"Calculated bounding box: {bbox}")
             
             # Add some padding (50% of the size)
             padding_factor = 1.5
@@ -56,7 +84,7 @@ class WebViewerBatched(WebViewer):
             y_size = (bbox['max_y'] - bbox['min_y']) * padding_factor
             z_size = (bbox['max_z'] - bbox['min_z']) * padding_factor
             
-            print(f"Raw sizes with padding: x={x_size:.3f}, y={y_size:.3f}, z={z_size:.3f}")
+            self.log(f"Raw sizes with padding: x={x_size:.3f}, y={y_size:.3f}, z={z_size:.3f}")
             
             # Ensure minimum spacing
             min_spacing = 2.0
@@ -66,7 +94,7 @@ class WebViewerBatched(WebViewer):
             
             return (x_offset, y_offset, z_offset)
         except Exception as e:
-            print(f"Warning: Failed to auto-calculate env_offset: {e}")
+            self.log(f"Warning: Failed to auto-calculate env_offset: {e}")
             return (4.0, 4.0, 2.0)  # Default fallback
 
     def _calculate_xml_bounding_box(self, xml_string: str) -> dict:

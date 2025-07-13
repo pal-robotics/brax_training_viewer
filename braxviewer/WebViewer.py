@@ -21,12 +21,47 @@ class WebViewer:
     def __init__(self,
                  host: str = "127.0.0.1",
                  port: int = 8000,
-                 log_level: str = "error",
+                 log_level: str = "info",
+                 server_log_level: str = "warning",
                  env: Optional[PipelineEnv] = None,):
         self.host = host
         self.port = port
-        self.logger = logging.getLogger("uvicorn.info")
+        
+        # Set up application logger for WebViewer
+        self.logger = logging.getLogger("brax.viewer")
         self.log_level = log_level
+        
+        # Set up server logger level (defaults to warning for less verbose output)
+        self.server_log_level = server_log_level
+        
+        # Level mapping for both loggers
+        level_mapping = {
+            "debug": logging.DEBUG,
+            "info": logging.INFO,
+            "warning": logging.WARNING,
+            "error": logging.ERROR,
+            "critical": logging.CRITICAL
+        }
+        
+        # Configure application logger
+        if not self.logger.handlers:
+            handler = logging.StreamHandler()
+            formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+            handler.setFormatter(formatter)
+            self.logger.addHandler(handler)
+            # Prevent propagation to parent loggers to avoid duplicate messages
+            self.logger.propagate = False
+        
+        self.logger.setLevel(level_mapping.get(log_level.lower(), logging.INFO))
+        
+        # Configure uvicorn logger separately
+        uvicorn_logger = logging.getLogger("uvicorn")
+        uvicorn_access_logger = logging.getLogger("uvicorn.access")
+        
+        # Set uvicorn logger levels
+        uvicorn_logger.setLevel(level_mapping.get(self.server_log_level.lower(), logging.WARNING))
+        uvicorn_access_logger.setLevel(level_mapping.get(self.server_log_level.lower(), logging.WARNING))
+        
         self.streamer = WebSocketStreamer(uri=f"ws://{self.host}:{self.port}/ws/frame")
         self.app = FastAPI()
         
@@ -258,7 +293,7 @@ class WebViewer:
         def start_server():
             self._loop = asyncio.new_event_loop()
             asyncio.set_event_loop(self._loop)
-            config = uvicorn.Config(self.app, host=self.host, port=self.port, log_level=self.log_level)
+            config = uvicorn.Config(self.app, host=self.host, port=self.port, log_level=self.server_log_level)
             server = uvicorn.Server(config)
             self._loop.run_until_complete(server.serve())
 
@@ -266,10 +301,12 @@ class WebViewer:
             self._server_thread = threading.Thread(target=start_server, daemon=True)
             self._server_thread.start()
             self.log(f"Brax Viewer starting on http://{self.host}:{self.port}")
+            self.log(f"Application log level: {self.log_level}")
+            self.log(f"Server log level: {self.server_log_level}")
             time.sleep(wait_for_startup)
             self.streamer.start()
         else:
-            uvicorn.run(self.app, host=self.host, port=self.port, log_level="info")
+            uvicorn.run(self.app, host=self.host, port=self.port, log_level=self.server_log_level)
 
     def stop(self):
         self.streamer.stop()
@@ -280,5 +317,14 @@ class WebViewer:
         if self.discard_queue:
             self.streamer.discard_queue()
 
-    def log(self, message: str):
-        self.logger.info(message)
+    def log(self, message: str, type: str = "info"):
+        if type == "info":
+            self.logger.info(message)
+        elif type == "warning":
+            self.logger.warning(message)
+        elif type == "error":
+            self.logger.error(message)
+        elif type == "debug":
+            self.logger.debug(message)
+        else:
+            self.logger.info(message)

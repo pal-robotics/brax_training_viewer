@@ -80,11 +80,13 @@ if __name__ == "__main__":
     
     num_parallel_envs = 8
     
-    # Define the 3D grid layout: (cols, rows, layers)
-    # For a 2x2x2 cube:
-    grid_dims = (4, 2, 1)
-    # For a flat 4x2 grid, use: grid_dims = (4, 2, 1)
-    # For a vertical stack, use: grid_dims = (1, 1, 8)
+    # grid_dims is now optional! If not provided, it will be auto-calculated
+    # as a square grid: ceil(sqrt(num_envs)) x ceil(sqrt(num_envs)) x 1
+    # For 8 envs: sqrt(8) = 2.83 -> ceil(2.83) = 3 -> (3, 3, 1) grid
+    
+    # If you want to override the auto-calculation, uncomment the lines below:
+    # grid_dims = (4, 2, 1)  # For a flat 4x2 grid
+    # grid_dims = (1, 1, 8)  # For a vertical stack
     
     # env_offset will be automatically calculated based on XML bounding box
     # If you want to override the auto-calculation, uncomment the line below:
@@ -93,14 +95,24 @@ if __name__ == "__main__":
     env_for_evaluation = CartPole(xml_model=xml_model, backend='mjx')
 
     # Instantiate the viewer with automatic XML concatenation
-    # env_offset is now optional and will be auto-calculated if not provided
+    # Both grid_dims and env_offset are now optional and will be auto-calculated
+    # 
+    # Default logging levels (you can override these if needed):
+    # - log_level="info": Shows useful information like auto-calculated grid_dims and env_offset
+    # - server_log_level="warning": Shows only important server events, not every HTTP request
+    #
+    # To customize logging, uncomment and modify:
+    # log_level="debug"        # For more detailed application logs
+    # server_log_level="info"  # For detailed server logs (HTTP requests, WebSocket connections)
     viewer = WebViewerBatched(
-        grid_dims=grid_dims,
-        # env_offset=env_offset_3d,  # This line is commented out to test auto-calculation
+        # grid_dims=grid_dims,  # Optional: will auto-calculate if not provided
+        # env_offset=env_offset_3d,  # Optional: will auto-calculate if not provided
         num_envs=num_parallel_envs,
         original_xml=xml_model,
         port=8080,
-        host='127.0.0.1'
+        host='127.0.0.1',
+        # log_level="info",        # Default: Application logs (auto-calculation, etc.)
+        # server_log_level="warning"  # Default: Server logs (only warnings and errors)
     )
     viewer.run()
 
