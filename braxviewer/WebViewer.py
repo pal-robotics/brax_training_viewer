@@ -13,7 +13,7 @@ from typing import Optional
 import logging
 import jinja2
 from brax.io import json
-from braxviewer.WebSocketStreamer import WebSocketStreamer
+from braxviewer.StateStreamer import StateStreamer
 import json as std_json
 import jax.numpy as jnp
 
@@ -62,7 +62,7 @@ class WebViewer:
         uvicorn_logger.setLevel(level_mapping.get(self.server_log_level.lower(), logging.WARNING))
         uvicorn_access_logger.setLevel(level_mapping.get(self.server_log_level.lower(), logging.WARNING))
         
-        self.streamer = WebSocketStreamer(uri=f"ws://{self.host}:{self.port}/ws/frame")
+        self.streamer = StateStreamer(uri=f"ws://{self.host}:{self.port}/ws/frame")
         self.app = FastAPI()
         
         # Add a state to control rendering. Default to True.
@@ -306,6 +306,7 @@ class WebViewer:
             time.sleep(wait_for_startup)
             self.streamer.start()
         else:
+            self.streamer.start()
             uvicorn.run(self.app, host=self.host, port=self.port, log_level=self.server_log_level)
 
     def stop(self):
@@ -313,6 +314,9 @@ class WebViewer:
         self.log("Viewer and streamer stopped.")
 
     def send_frame(self, state):
+        if not self.rendering_enabled:
+            return
+        self.log("Frame received by viewer. Queueing for send.", type="debug")
         self.streamer.send(state)
         if self.discard_queue:
             self.streamer.discard_queue()
