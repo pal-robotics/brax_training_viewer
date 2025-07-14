@@ -20,6 +20,7 @@ As this tool extends the official Brax PPO training function, it ensures seamles
 -   (Optionally) creat a virtual environment `conda create -n test python=3.10`
 -   `conda activate test`
 -   `cd` to the root folder of this repo
+-   run `git submodule update --init --recursive` to pull modified brax library
 -   run `pip install .`
 -   run `pip install -r requirements.txt `
 -   (Optionally) install Jax in hardware accelaration version `pip install -U "jax[cuda12]"` or `pip install -U "jax[cuda11]"` or `pip install -U "jax[tpu]"`
@@ -30,6 +31,8 @@ As this tool extends the official Brax PPO training function, it ensures seamles
 
 [UV](https://github.com/astral-sh/uv) is an extremely fast Python package installer and resolver, written in Rust.
 
+-   `cd` to the root folder of this repo
+-   run `git submodule update --init --recursive` to pull modified brax library
 -   Install uv `pip install uv`
 -   Create a virtual environment `uv venv`
 -   Activate the virtual environment `source .venv/bin/activate`
@@ -98,7 +101,7 @@ To visualize multiple environments running in parallel, use `WebViewerBatched`. 
 
     ```python
     num_parallel_envs = 8
-    grid_dims = (4, 2, 1)  # 4 columns, 2 rows, 1 layer
+    grid_dims = (4, 2, 1)  # 4 columns - x axis, 2 rows y axis, 1 layer z axis
     env_offset = (4.0, 4.0, 2.0) # Spacing between envs in (x, y, z)
 
     # Instantiate the batched viewer with grid info
@@ -113,7 +116,7 @@ To visualize multiple environments running in parallel, use `WebViewerBatched`. 
     The viewer needs a single large environment definition that contains all parallel agents.
 
     ```python
-    # The original xml model for a single cartpole
+    # Your robot XML. Examples can be seen from brax official repository:https://github.com/google/brax/tree/main/brax/envs/assets
     xml_model = "..." 
 
     # Create a concatenated XML string for all envs
