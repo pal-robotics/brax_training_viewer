@@ -101,7 +101,7 @@ To visualize multiple environments running in parallel, use `WebViewerBatched`. 
 
     ```python
     num_parallel_envs = 8
-    grid_dims = (4, 2, 1)  # 4 columns - x axis, 2 rows y axis, 1 layer z axis
+    grid_dims = (4, 2, 1)  # 4 columns - x axis, 2 rows - y axis, 1 layer - z axis
     env_offset = (4.0, 4.0, 2.0) # Spacing between envs in (x, y, z)
 
     # Instantiate the batched viewer with grid info
