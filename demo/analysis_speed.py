@@ -4,9 +4,12 @@ Brax Training Speed Analysis Script
 
 This script benchmarks the training speed of Brax PPO under different rendering conditions and hyperparameter settings.
 It measures the time for three scenarios:
-  1. Viewer created and rendering ON
-  2. Viewer created but rendering OFF
-  3. No viewer (pure Brax training)
+  1. Viewer created and rendering ON (render_fn + should_render=True)
+  2. Viewer created but rendering OFF (render_fn + should_render=False, avoids io_callback)
+  3. No viewer (render_fn=None + should_render=False, pure Brax training)
+
+The new should_render parameter allows efficient control of rendering without the overhead
+of io_callback when rendering is disabled.
 
 It supports large-scale batched environments and produces CSV, TXT, and figure outputs for performance analysis.
 
@@ -62,7 +65,7 @@ It supports large-scale batched environments and produces CSV, TXT, and figure o
 
 4. **View the Web Viewer**
 
-   During training, open your browser to the port shown in the console (default: 8000, 8001, etc.) to view the 3D rendering.
+   During training, open your browser to the port shown in the console (default: 8100, 8001, etc.) to view the 3D rendering.
 
 
 """
@@ -224,9 +227,12 @@ xml_string = epath.resource_path('brax') / f'envs/assets/{env_name}.xml'
 xml_string = xml_string.read_text()
 
 def make_render_fn(viewer, num_envs):
+    """Create a render function that sends batched states to the viewer.
+    
+    Note: This function no longer checks viewer.rendering_enabled internally.
+    Rendering control is now handled by the should_render parameter in ppo.train().
+    """
     def render_fn(state):
-        if not viewer.rendering_enabled:
-            return
         # Batched: send each env's state
         for i in range(num_envs):
             single_state = jax.tree_util.tree_map(lambda x: x[i], state)
@@ -460,10 +466,12 @@ def run_all_experiments():
             print("="*80)
 
             # -- Scenario 1: Train WITH viewer and rendering ON --
+            # render_fn=make_render_fn(viewer, ...) + should_render=True
+            # This will call io_callback and actually render frames
             print("\n--- Scenario 1: Training WITH viewer (rendering ON) ---")
-            viewer = WebViewerBatched(num_envs=config['num_envs'], xml=xml_string, port=8000 + i*3)
+            viewer = WebViewerBatched(num_envs=config['num_envs'], xml=xml_string, port=8100 + i*3)
             viewer.run(wait_for_startup=1)  # Reduce wait time
-            print(f"Viewer started on port {8000 + i*3}")
+            print(f"Viewer started on port {8100 + i*3}")
             start_time_with_viewer = time.time()
             ppo.train(
                 environment=env,
@@ -495,11 +503,14 @@ def run_all_experiments():
             print(f"--- Finished training WITH viewer in {elapsed_time_with_viewer:.2f} seconds ---")
 
             # -- Scenario 2: Train WITH viewer but rendering OFF --
+            # render_fn=make_render_fn(viewer, ...) + should_render=False
+            # This will NOT call io_callback, avoiding rendering overhead
             print("\n--- Scenario 2: Training WITH viewer (rendering OFF) ---")
             viewer_no_render = WebViewerBatched(num_envs=config['num_envs'], xml=xml_string, port=8001 + i*3)
             viewer_no_render.run(wait_for_startup=1)  # Reduce wait time
             print(f"Viewer started on port {8001 + i*3}")
-            viewer_no_render.rendering_enabled = False  # Disable rendering
+            # Note: No need to set viewer_no_render.rendering_enabled = False anymore
+            # The should_render=False parameter will control rendering
             start_time_with_viewer_no_render = time.time()
             ppo.train(
                 environment=env,
@@ -531,6 +542,8 @@ def run_all_experiments():
             print(f"--- Finished training WITH viewer (no render) in {elapsed_time_with_viewer_no_render:.2f} seconds ---")
 
             # -- Scenario 3: Train WITHOUT viewer (normal Brax training) --
+            # render_fn=None + should_render=False
+            # This is pure Brax training without any viewer overhead
             print("\n--- Scenario 3: Training WITHOUT viewer (normal Brax) ---")
             start_time_no_viewer = time.time()
             ppo.train(
