@@ -93,6 +93,7 @@ from brax.training.agents.ppo import networks as ppo_networks
 
 # Define the different workloads you want to test.
 # We will vary multiple hyperparameters to test different scenarios.
+# For testing, you can use a smaller subset by uncommenting the TEST_CONFIGS below
 EXPERIMENT_CONFIGS = [
     # Small workloads
     {
@@ -180,6 +181,19 @@ EXPERIMENT_CONFIGS = [
         'num_updates_per_batch': 10,
     }
 ]
+
+# Uncomment the line below for quick testing with just one small experiment
+# EXPERIMENT_CONFIGS = [EXPERIMENT_CONFIGS[0]]  # Only run the first experiment
+
+# For debugging: uncomment to test with minimal parameters
+# EXPERIMENT_CONFIGS = [{
+#     'name': 'Debug Test',
+#     'num_envs': 64,  # Very small for testing
+#     'batch_size': 32,
+#     'num_minibatches': 2,
+#     'unroll_length': 5,
+#     'num_updates_per_batch': 4,
+# }]
 
 
 # === 3. Environment and Helper Functions ===
@@ -447,7 +461,8 @@ def run_all_experiments():
             # -- Scenario 1: Train WITH viewer and rendering ON --
             print("\n--- Scenario 1: Training WITH viewer (rendering ON) ---")
             viewer = WebViewerBatched(num_envs=config['num_envs'], xml=xml_string, port=8000 + i*3)
-            viewer.run()
+            viewer.run(wait_for_startup=1)  # Reduce wait time
+            print(f"Viewer started on port {8000 + i*3}")
             start_time_with_viewer = time.time()
             ppo.train(
                 environment=env,
@@ -480,7 +495,8 @@ def run_all_experiments():
             # -- Scenario 2: Train WITH viewer but rendering OFF --
             print("\n--- Scenario 2: Training WITH viewer (rendering OFF) ---")
             viewer_no_render = WebViewerBatched(num_envs=config['num_envs'], xml=xml_string, port=8001 + i*3)
-            viewer_no_render.run()
+            viewer_no_render.run(wait_for_startup=1)  # Reduce wait time
+            print(f"Viewer started on port {8001 + i*3}")
             viewer_no_render.rendering_enabled = False  # Disable rendering
             start_time_with_viewer_no_render = time.time()
             ppo.train(
