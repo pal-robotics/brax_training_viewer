@@ -116,7 +116,7 @@ To visualize multiple environments running in parallel, use `WebViewerBatched`. 
     The viewer needs a single large environment definition that contains all parallel agents.
 
     ```python
-    # Your robot XML. Examples can be seen from brax official repository:https://github.com/google/brax/tree/main/brax/envs/assets
+    # Your robot XML. Examples can be seen from brax official repository:https://github.com/google/brax/tree/300b1079363894733fa1090c6bb055b881eb0ac1/brax/envs/assets
     xml_model = "..." 
 
     # Create a concatenated XML string for all envs
