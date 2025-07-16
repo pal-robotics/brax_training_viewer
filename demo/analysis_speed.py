@@ -1,3 +1,71 @@
+"""
+Brax Training Speed Analysis Script
+==================================
+
+This script benchmarks the training speed of Brax PPO under different rendering conditions and hyperparameter settings.
+It measures the time for three scenarios:
+  1. Viewer created and rendering ON
+  2. Viewer created but rendering OFF
+  3. No viewer (pure Brax training)
+
+It supports large-scale batched environments and produces CSV, TXT, and figure outputs for performance analysis.
+
+---
+
+## Usage
+
+1. **Install Python dependencies**
+
+   This script requires Python 3.8+ and the following packages:
+
+   - jax
+   - numpy
+   - pandas
+   - matplotlib
+   - etils
+   - fastapi
+   - uvicorn
+   - (and their dependencies)
+
+   You can install them via pip:
+
+   ```bash
+   pip install jax numpy pandas matplotlib etils fastapi uvicorn
+   ```
+
+2. **Install Brax and BraxViewer**
+
+   - If you use the official Brax:
+     ```bash
+     pip install brax
+     ```
+   - If you use a custom/forked Brax (with rendering callback support), install your local version:
+     ```bash
+     pip install -e /path/to/your/brax
+     ```
+   - For BraxViewer (this repo):
+     ```bash
+     pip install -e .
+     ```
+     (run this in the root of your brax_training_viewer repo)
+
+3. **Run the script**
+
+   ```bash
+   python demo/analysis_speed.py
+   ```
+
+   The script will run multiple experiments and save results to:
+   - `training_times_analysis.csv` (raw data)
+   - `training_times_analysis.txt` (human-readable summary)
+   - `training_times_analysis.png`/`.pdf` (figures)
+
+4. **View the Web Viewer**
+
+   During training, open your browser to the port shown in the console (default: 8000, 8001, etc.) to view the 3D rendering.
+
+
+"""
 # === 1. Imports and System Path Setup ===
 
 import time
@@ -14,9 +82,11 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 
 import jax
 from brax import envs
-from braxviewer.WebViewer import WebViewer
+from braxviewer.WebViewerBatched import WebViewerBatched
 from brax.training.agents.ppo import train as ppo
 from brax.training.agents.sac import train as sac
+from brax.envs.wrappers.training import VmapWrapper, EpisodeWrapper, AutoResetWrapper
+from brax.training.agents.ppo import networks as ppo_networks
 
 
 # === 2. Experiment Configurations ===
@@ -116,14 +186,54 @@ EXPERIMENT_CONFIGS = [
 
 # Environment setup (remains the same)
 env_name = 'humanoid'
-backend = 'positional'
+backend = 'mjx'
 env = envs.get_environment(env_name=env_name, backend=backend)
+
+# Get XML asset path for the environment
+from etils import epath
+xml_asset_paths = {
+    'ant': 'brax/envs/assets/ant.xml',
+    'halfcheetah': 'brax/envs/assets/half_cheetah.xml',
+    'hopper': 'brax/envs/assets/hopper.xml',
+    'humanoid': 'brax/envs/assets/humanoid.xml',
+    'humanoidstandup': 'brax/envs/assets/humanoidstandup.xml',
+    'inverted_double_pendulum': 'brax/envs/assets/inverted_double_pendulum.xml',
+    'inverted_pendulum': 'brax/envs/assets/inverted_pendulum.xml',
+    'pusher': 'brax/envs/assets/pusher.xml',
+    'reacher': 'brax/envs/assets/reacher.xml',
+    'swimmer': 'brax/envs/assets/swimmer.xml',
+    'walker2d': 'brax/envs/assets/walker2d.xml',
+}
+xml_path = xml_asset_paths[env_name]
+xml_string = epath.resource_path('brax') / f'envs/assets/{env_name}.xml'
+xml_string = xml_string.read_text()
+
+def make_render_fn(viewer, num_envs):
+    def render_fn(state):
+        if not viewer.rendering_enabled:
+            return
+        # Batched: send each env's state
+        for i in range(num_envs):
+            single_state = jax.tree_util.tree_map(lambda x: x[i], state)
+            viewer.send_frame(single_state)
+    return render_fn
 
 # Progress function (remains the same)
 def progress(num_steps, metrics):
   """A simple callback to show that training is making progress."""
   print(f'    ...at num_steps: {num_steps}')
 
+def progress_fn(current_step, metrics):
+    if current_step > 0:
+        print(f'Training Step: {current_step} \t Eval Reward: {metrics.get("eval/episode_reward", 0):.3f}')
+
+make_networks_factory = ppo_networks.make_ppo_networks
+
+def custom_wrap_env(env, episode_length=1000, action_repeat=1, randomization_fn=None):
+    env = VmapWrapper(env)
+    env = EpisodeWrapper(env, episode_length, action_repeat)
+    env = AutoResetWrapper(env)
+    return env
 
 def save_text_results(results_data, output_filename):
     """Save detailed results to a text file."""
@@ -334,34 +444,34 @@ def run_all_experiments():
             print(f"           num_updates_per_batch={config['num_updates_per_batch']}")
             print("="*80)
 
-            # --- Dynamically create the training function for THIS experiment ---
-            train_fn = functools.partial(
-                ppo.train,
+            # -- Scenario 1: Train WITH viewer and rendering ON --
+            print("\n--- Scenario 1: Training WITH viewer (rendering ON) ---")
+            viewer = WebViewerBatched(num_envs=config['num_envs'], xml=xml_string, port=8000 + i*3)
+            viewer.run()
+            start_time_with_viewer = time.time()
+            ppo.train(
+                environment=env,
+                eval_env=env,
                 num_timesteps=50_000_000,
                 num_evals=10,
-                reward_scaling=0.1,
                 episode_length=1000,
-                normalize_observations=True,
-                action_repeat=1,
-                discounting=0.97,
-                learning_rate=3e-4,
-                entropy_cost=1e-3,
-                seed=1,
-                # Parameters from our config dictionary
                 num_envs=config['num_envs'],
+                num_eval_envs=config['num_envs'],
                 batch_size=config['batch_size'],
                 num_minibatches=config['num_minibatches'],
                 unroll_length=config['unroll_length'],
-                num_updates_per_batch=config['num_updates_per_batch']
+                num_updates_per_batch=config['num_updates_per_batch'],
+                normalize_observations=True,
+                discounting=0.97,
+                learning_rate=3e-4,
+                entropy_cost=1e-3,
+                network_factory=make_networks_factory,
+                seed=1,
+                wrap_env=True,
+                wrap_env_fn=custom_wrap_env,
+                render_fn=make_render_fn(viewer, config['num_envs']),
+                progress_fn=progress_fn,
             )
-
-            # -- Scenario 1: Train WITH viewer and rendering ON --
-            print("\n--- Scenario 1: Training WITH viewer (rendering ON) ---")
-            viewer = WebViewer()
-            viewer.run()
-            viewer.init(env)
-            start_time_with_viewer = time.time()
-            train_fn(environment=env, progress_fn=progress, viewer=viewer)
             end_time_with_viewer = time.time()
             viewer.stop()
             elapsed_time_with_viewer = end_time_with_viewer - start_time_with_viewer
@@ -369,12 +479,33 @@ def run_all_experiments():
 
             # -- Scenario 2: Train WITH viewer but rendering OFF --
             print("\n--- Scenario 2: Training WITH viewer (rendering OFF) ---")
-            viewer_no_render = WebViewer()
+            viewer_no_render = WebViewerBatched(num_envs=config['num_envs'], xml=xml_string, port=8001 + i*3)
             viewer_no_render.run()
-            viewer_no_render.init(env)
             viewer_no_render.rendering_enabled = False  # Disable rendering
             start_time_with_viewer_no_render = time.time()
-            train_fn(environment=env, progress_fn=progress, viewer=viewer_no_render)
+            ppo.train(
+                environment=env,
+                eval_env=env,
+                num_timesteps=50_000_000,
+                num_evals=10,
+                episode_length=1000,
+                num_envs=config['num_envs'],
+                num_eval_envs=config['num_envs'],
+                batch_size=config['batch_size'],
+                num_minibatches=config['num_minibatches'],
+                unroll_length=config['unroll_length'],
+                num_updates_per_batch=config['num_updates_per_batch'],
+                normalize_observations=True,
+                discounting=0.97,
+                learning_rate=3e-4,
+                entropy_cost=1e-3,
+                network_factory=make_networks_factory,
+                seed=1,
+                wrap_env=True,
+                wrap_env_fn=custom_wrap_env,
+                render_fn=make_render_fn(viewer_no_render, config['num_envs']),
+                progress_fn=progress_fn,
+            )
             end_time_with_viewer_no_render = time.time()
             viewer_no_render.stop()
             elapsed_time_with_viewer_no_render = end_time_with_viewer_no_render - start_time_with_viewer_no_render
@@ -383,7 +514,29 @@ def run_all_experiments():
             # -- Scenario 3: Train WITHOUT viewer (normal Brax training) --
             print("\n--- Scenario 3: Training WITHOUT viewer (normal Brax) ---")
             start_time_no_viewer = time.time()
-            train_fn(environment=env, progress_fn=progress)
+            ppo.train(
+                environment=env,
+                eval_env=env,
+                num_timesteps=50_000_000,
+                num_evals=10,
+                episode_length=1000,
+                num_envs=config['num_envs'],
+                num_eval_envs=config['num_envs'],
+                batch_size=config['batch_size'],
+                num_minibatches=config['num_minibatches'],
+                unroll_length=config['unroll_length'],
+                num_updates_per_batch=config['num_updates_per_batch'],
+                normalize_observations=True,
+                discounting=0.97,
+                learning_rate=3e-4,
+                entropy_cost=1e-3,
+                network_factory=make_networks_factory,
+                seed=1,
+                wrap_env=True,
+                wrap_env_fn=custom_wrap_env,
+                render_fn=None,
+                progress_fn=progress_fn,
+            )
             end_time_no_viewer = time.time()
             elapsed_time_no_viewer = end_time_no_viewer - start_time_no_viewer
             print(f"--- Finished training WITHOUT viewer in {elapsed_time_no_viewer:.2f} seconds ---")
