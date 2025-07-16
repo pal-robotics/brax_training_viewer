@@ -2,7 +2,6 @@
 
 import sys
 import os
-import functools
 import time
 
 # Add project path to sys.path to allow for relative imports.
@@ -105,14 +104,21 @@ if __name__ == '__main__':
   env_for_evaluation = CartPole(xml_model=xml_model, backend='mjx')
   env_for_training = ViewerWrapper(env=env_for_evaluation, viewer=viewer)
 
-  # Define PPO network and training function.
-  make_networks_factory = functools.partial(
-      ppo_networks.make_ppo_networks,
-      policy_hidden_layer_sizes=(64, 64, 64, 64),
-  )
+  # Define PPO network
+  make_networks_factory = ppo_networks.make_ppo_networks
 
-  train_fn = functools.partial(
-      ppo.train,
+  def progress_fn(current_step, metrics):
+    """Prints training progress."""
+    if current_step > 0:
+      print(
+          f'Training Step: {current_step} \t '
+          f'Eval Reward: {metrics["eval/episode_reward"]:.3f}'
+      )
+
+  # Run the training.
+  make_policy_fn, params, _ = ppo.train(
+      environment=env_for_training,
+      eval_env=env_for_evaluation,
       num_timesteps=40000,
       num_evals=10,
       episode_length=300,
@@ -128,20 +134,6 @@ if __name__ == '__main__':
       entropy_cost=1e-2,
       network_factory=make_networks_factory,
       seed=0,
-  )
-
-  def progress_fn(current_step, metrics):
-    """Prints training progress."""
-    if current_step > 0:
-      print(
-          f'Training Step: {current_step} \t '
-          f'Eval Reward: {metrics["eval/episode_reward"]:.3f}'
-      )
-
-  # Run the training.
-  make_policy_fn, params, _ = train_fn(
-      environment=env_for_training,
-      eval_env=env_for_evaluation,
       progress_fn=progress_fn,
   )
 
