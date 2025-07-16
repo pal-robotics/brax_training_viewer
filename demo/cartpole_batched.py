@@ -86,7 +86,8 @@ if __name__ == '__main__':
     # Use default grid/offset (let WebViewerBatched auto-calculate)
     viewer = WebViewerBatched(
         num_envs=num_parallel_envs,
-        xml=xml_model
+        xml=xml_model,
+        port=8081
     )
     viewer.run()
 
@@ -125,6 +126,7 @@ if __name__ == '__main__':
         wrap_env=True,
         wrap_env_fn=custom_wrap_env,
         render_fn=render_fn,
+        should_render=jnp.array(True, dtype=jnp.bool_),
         progress_fn=progress_fn,
     )
 

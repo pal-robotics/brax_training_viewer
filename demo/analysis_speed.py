@@ -81,6 +81,7 @@ import pandas as pd
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 import jax
+import jax.numpy as jnp
 from brax import envs
 from braxviewer.WebViewerBatched import WebViewerBatched
 from brax.training.agents.ppo import train as ppo
@@ -485,6 +486,7 @@ def run_all_experiments():
                 wrap_env=True,
                 wrap_env_fn=custom_wrap_env,
                 render_fn=make_render_fn(viewer, config['num_envs']),
+                should_render=jnp.array(True, dtype=jnp.bool_),
                 progress_fn=progress_fn,
             )
             end_time_with_viewer = time.time()
@@ -520,6 +522,7 @@ def run_all_experiments():
                 wrap_env=True,
                 wrap_env_fn=custom_wrap_env,
                 render_fn=make_render_fn(viewer_no_render, config['num_envs']),
+                should_render=jnp.array(False, dtype=jnp.bool_),
                 progress_fn=progress_fn,
             )
             end_time_with_viewer_no_render = time.time()
@@ -551,6 +554,7 @@ def run_all_experiments():
                 wrap_env=True,
                 wrap_env_fn=custom_wrap_env,
                 render_fn=None,
+                should_render=jnp.array(False, dtype=jnp.bool_),
                 progress_fn=progress_fn,
             )
             end_time_no_viewer = time.time()
