@@ -1,3 +1,4 @@
 [submodule "braxviewer/brax"]
 	path = braxviewer/brax
 	url = https://github.com/pal-robotics-forks/brax.git
+	branch = brax_viewer_integration

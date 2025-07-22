@@ -7,7 +7,7 @@ authors = [
 ]
 readme = { file = "README.md", content-type = "text/markdown" }
 requires-python = ">=3.10"
-license-files = [ "LICENSE" ]
+license = "Apache-2.0"
 keywords = [
     "visualization",
     "reinforcement learning",
@@ -21,3 +21,6 @@ dependencies = [
     "uvicorn>=0.34.3",
     "websockets>=15.0.1",
 ]
+
+[tool.setuptools.packages.find]
+include = ["braxviewer"]
