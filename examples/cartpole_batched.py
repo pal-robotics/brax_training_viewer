@@ -15,6 +15,7 @@ from braxviewer.WebViewerBatched import WebViewerBatched
 from braxviewer.brax.brax.training.agents.ppo import train as ppo
 from brax.training.agents.ppo import networks as ppo_networks
 from brax.envs.wrappers.training import VmapWrapper, EpisodeWrapper, AutoResetWrapper
+from braxviewer.brax.brax.envs.wrappers.viewer import ViewerWrapper
 
 # ==============================================================================
 #  Environment Definition
@@ -91,13 +92,8 @@ if __name__ == '__main__':
     )
     viewer.run()
 
-    def render_fn(state):
-        if not viewer.rendering_enabled:
-            return
-        num_envs = state.pipeline_state.q.shape[0]
-        for i in range(num_envs):
-            single_state = jax.tree_util.tree_map(lambda x: x[i], state)
-            viewer.send_frame(single_state)
+    # Wrap the environment with the ViewerWrapper to enable rendering.
+    env_for_training = ViewerWrapper(env=env_for_training, viewer=viewer)
 
     make_networks_factory = ppo_networks.make_ppo_networks
 
@@ -125,8 +121,6 @@ if __name__ == '__main__':
         seed=0,
         wrap_env=True,
         wrap_env_fn=custom_wrap_env,
-        render_fn=render_fn,
-        should_render=jnp.array(True, dtype=jnp.bool_),
         progress_fn=progress_fn,
     )
 
