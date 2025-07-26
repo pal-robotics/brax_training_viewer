@@ -14,7 +14,8 @@ class StateStreamer:
     """
 
     def __init__(self, uri="ws://localhost:8000/ws/frame", unbatched: bool = True):
-        self.uri = uri
+        # Add a query parameter to identify this client as the data streamer.
+        self.uri = f"{uri}?is_streamer=true"
         self._state_queue = queue.Queue()
         self._thread = None
         self._started = False
