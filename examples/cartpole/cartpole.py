@@ -11,10 +11,9 @@ import jax
 import jax.numpy as jnp
 from brax.io import mjcf
 from brax.envs.base import PipelineEnv, State
-from braxviewer.WebViewerBatched import WebViewerBatched
+from braxviewer.WebViewerParallel import WebViewerParallel
 from brax.training.agents.ppo import train as ppo
 from brax.training.agents.ppo import networks as ppo_networks
-from brax.envs.wrappers.training import VmapWrapper, EpisodeWrapper, AutoResetWrapper
 from brax.envs.wrappers.viewer import ViewerWrapper
 
 # ==============================================================================
@@ -78,8 +77,8 @@ if __name__ == '__main__':
     num_parallel_envs = 8
     env_for_evaluation = CartPole(xml_model=xml_model, backend='mjx')
 
-    # Use default grid/offset (let WebViewerBatched auto-calculate)
-    viewer = WebViewerBatched(
+    # Use default grid/offset (let WebViewerParallel auto-calculate)
+    viewer = WebViewerParallel(
         num_envs=num_parallel_envs,
         xml=xml_model,
     )

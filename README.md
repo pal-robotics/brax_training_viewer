@@ -68,7 +68,7 @@ read2. Create a viewer and wrap your environment with `ViewerWrapper`.
 
 ### 1. Import Modules
 ```python
-from braxviewer.WebViewerBatched import WebViewerBatched
+from braxviewer.WebViewerParallel import WebViewerParallel
 from brax.training.agents.ppo import train as ppo
 from brax.envs.wrappers.viewer import ViewerWrapper
 ```
@@ -79,7 +79,7 @@ from brax.envs.wrappers.viewer import ViewerWrapper
 env = YourBraxEnvironment(xml_model=xml_model)
 
 # Create viewer
-viewer = WebViewerBatched(num_envs=8, xml=xml_model)
+viewer = WebViewerParallel(num_envs=8, xml=xml_model)
 viewer.run()
 
 # Wrap with ViewerWrapper

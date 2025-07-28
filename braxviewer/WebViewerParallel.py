@@ -8,7 +8,7 @@ from braxviewer.config import BatchedViewerConfig
 from braxviewer.viewer import Viewer
 from braxviewer.server import Server
 
-class WebViewerBatched:
+class WebViewerParallel:
     def __init__(self,
                  host: str = "127.0.0.1",
                  port: int = 8000,
@@ -31,8 +31,8 @@ class WebViewerBatched:
     def stop(self):
         self.server.stop()
 
-    def send_frame(self, state: State):
-        self.viewer.send_frame(state)
+    def send_frame(self, state: State, env_id: int = 0):
+        self.viewer.send_frame(state, env_id)
         
     def stitch_state(self, batched_state: State) -> State:
         return self.viewer.stitch_state(batched_state)
@@ -69,13 +69,9 @@ class BatchedViewer(Viewer):
         # BatchedViewer has a slightly different init flow
         super().init(self.concatenated_xml)
 
-    def send_frame(self, state: State):
+    def send_frame(self, state: State, env_id: int = 0):
         if not self.rendering_enabled:
             return
-
-        env_id = state.info.get('env_id', 0)
-        if hasattr(env_id, 'item'):
-            env_id = env_id.item()
 
         cols, rows, _ = self.config.grid_dims
         envs_per_layer = cols * rows
@@ -178,7 +174,17 @@ class BatchedViewer(Viewer):
             return [float(x) for x in pos_str.split()]
 
         def calculate_geom_bounds(geom, parent_pos=[0, 0, 0]):
-            geom_type = geom.get('type', 'box')
+            if 'type' not in geom.attrib:
+                name = geom.get('name', '[unnamed]')
+                self.log(f"Warning: geom '{name}' is missing 'type' attribute. Skipping for bounding box calculation.", level='warning')
+                return
+
+            geom_type = geom.get('type')
+
+            # Ignore planes for a more accurate agent-focused bounding box
+            if geom_type == 'plane':
+                return
+            
             pos = parse_position(geom.get('pos', '0 0 0'))
             pos = [pos[i] + parent_pos[i] for i in range(3)]
             
@@ -201,9 +207,6 @@ class BatchedViewer(Viewer):
                     radius = float(size_parts[0])
                     length = float(size_parts[1]) if len(size_parts) > 1 else radius
                     update_bounds(pos, [radius, radius, length])
-            elif geom_type == 'plane':
-                size = parse_position(geom.get('size', '10 10 0.1'))
-                update_bounds(pos, size)
             elif geom_type == 'cylinder':
                 size_parts = geom.get('size', '0.1 0.1').split()
                 radius = float(size_parts[0])
