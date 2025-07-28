@@ -1,6 +1,6 @@
 # Brax Training Viewer for Real-Time Policy Visualization
 
-This project is developed during the Google Summer of Code 2025.
+This project is developed during the [Google Summer of Code 2025](https://summerofcode.withgoogle.com/programs/2025/projects/Xm0toJHl).
 
 Reinforcement Learning (RL) training in Brax operates at high performance, utilizing JAX for efficient parallelized training. However, due to the nature of JAX’s computation model, training occurs in a highly abstracted and batched manner, making it challenging to inspect agent behavior in real-time. Currently, users must either wait until training finishes to evaluate policies or extract rollout data manually, which is inefficient and restricts debugging capabilities. A Brax Training Viewer would empower users to visualize the evolution of the policy while training is ongoing, bridging the gap between RL research and practical interpretability.
 
@@ -22,11 +22,12 @@ As this tool extends the official Brax PPO training function, it ensures seamles
 -   `conda activate test`
 -   `cd` to the root folder of this repo
 -   run `git submodule update --init --recursive`
+-   run `pip install -e braxviewer/brax`
 -   run `pip install .`
 -   run `pip install -r requirements.txt `
 -   (Optionally) install Jax with hardware acceleration: `pip install -U "jax[cuda12]"` or `pip install -U "jax[cuda11]"` or `pip install -U "jax[tpu]"`
--   You can try the examples in the `demo/` folder, for example: `python demo/cartpole.py`
--   Open a web browser and go to `http://127.0.0.1:8000/` for the viewer.
+-   You can try the examples in the `examples/` folder, for example: `python examples/cartpole/cartpole.py`
+-   Open a web browser and go to `http://127.0.0.1:8081/` for the viewer.
 
 ### UV
 [UV](https://github.com/astral-sh/uv) is an extremely fast Python package installer and resolver, written in Rust.
@@ -36,117 +37,76 @@ As this tool extends the official Brax PPO training function, it ensures seamles
 -   Create a virtual environment `uv venv`
 -   Activate the virtual environment `source .venv/bin/activate`
 -   Install dependencies `uv pip install -r requirements.txt`
--   Install the project `uv pip install .`
--   You can try the examples provided in the `demo/` folder, for instance: `python demo/training_example.py`
--   Open a web browser and navigate to `http://127.0.0.1:8000/` to see the viewer.
+-   Install the project with `uv pip install -e braxviewer/brax` and `uv pip install .`
+-   You can try the examples provided in the `examples/` folder, for instance: `python examples/cartpole/cartpole.py`
+-   Open a web browser and navigate to `http://127.0.0.1:8081/` to see the viewer.
 
 ## How to Use
 
-Integrating the viewer into your existing Brax training script is straightforward. The core idea is to instantiate the appropriate viewer, wrap your training environment with `ViewerWrapper`, and then pass the wrapped environment to the training function.
+Integrating the viewer into your existing Brax training script is straightforward. The core steps are:
+1. Import the necessary components.
+2. Instantiate the appropriate viewer (`WebViewer` for a single instance, `WebViewerBatched` for multiple).
+3. Wrap your environment instance with `ViewerWrapper`.
+4. Pass the wrapped environment to the `ppo.train` function.
 
-### For a Single Environment Visualization
+Below is a guide that covers both single and batched visualization.
 
-This is the simplest use case, ideal for standard Brax environments. The following example demonstrates how to visualize a generic agent.
+### 1. Import Modules
+First, import all the necessary modules. This set of imports works for both single and batched setups.
 
-1.  **Import necessary modules**:
-    ```python
-    from braxviewer.WebViewer import WebViewer
-    from braxviewer.brax.brax.envs.wrappers.viewer import ViewerWrapper
-    from braxviewer.brax.brax.training.agents.ppo import train as ppo
-    from brax.training.agents.ppo import networks as ppo_networks
-    # from your_project import YourBraxEnvironment # Import your custom env
-    ```
+```python
+import time
+from braxviewer.WebViewer import WebViewer
+from braxviewer.WebViewerBatched import WebViewerBatched
+from braxviewer.brax.brax.envs.wrappers.viewer import ViewerWrapper
+from braxviewer.brax.brax.training.agents.ppo import train as ppo
+from brax.training.agents.ppo import networks as ppo_networks
+# from your_project import YourBraxEnvironment, custom_wrap_env
+```
 
-2.  **Create the Viewer and Wrap the Environment**:
-    ```python
-    # Load your robot's XML model string. Examples can be found in the
-    # official Brax repository: https://github.com/google/brax/tree/main/brax/envs/assets
-    xml_model = "..." 
+### 2. Instantiate Viewer and Wrap Environment
 
-    # Instantiate the viewer and run it in the background
-    viewer = WebViewer(xml=xml_model)
-    viewer.run()
+First, create your environment. This step is the same for both single and batched visualization.
+```python
+# Your robot XML. Examples can be found in the Brax assets folder
+# https://github.com/google/brax/tree/300b1079363894733fa1090c6bb055b881eb0ac1/brax/envs/assets
+xml_model = "..."
+env = YourBraxEnvironment(xml_model=xml_model)
+```
 
-    # Create an instance of your custom Brax environment
-    env_for_evaluation = YourBraxEnvironment(xml_model=xml_model)
+Next, choose and instantiate the viewer based on your needs.
 
-    # Wrap the environment to link it with the viewer
-    env_for_training = ViewerWrapper(env=env_for_evaluation, viewer=viewer)
-    ```
+**Option A: For a single environment**
+```python
+num_parallel_envs = 1
+viewer = WebViewer(xml=xml_model)
+```
 
-3.  **Call the Training Function**:
-    Directly call the `ppo.train` function with the wrapped environment and other training parameters.
+**Option B: For batched (parallel) environments**
+```python
+num_parallel_envs = 8
+viewer = WebViewerBatched(num_envs=num_parallel_envs, xml=xml_model)
+```
 
-    ```python
-    # Define the PPO network
-    make_networks_factory = ppo_networks.make_ppo_networks
+Finally, run the viewer and wrap the environment. 
+```python
+viewer.run()
+env_for_visualization = ViewerWrapper(env=env, viewer=viewer)
+```
 
-    # Call the training function directly
-    make_policy_fn, params, _ = ppo.train(
-        environment=env_for_training,
-        eval_env=env_for_evaluation, # Use the original env for evaluation
-        num_timesteps=40000,
-        episode_length=300,
-        num_envs=1, # Single environment
-        normalize_observations=True,
-        network_factory=make_networks_factory
-        # ... add other ppo parameters as needed
-    )
-    ```
+### 3. Call the Training Function
 
-### For Batched (Parallel) Environment Visualization
+Finally, call `ppo.train` with the wrapped environment. You may visualize either train_env or evaluate_env.
 
-To visualize multiple environments running in parallel, use `WebViewerBatched`. This viewer automatically handles the arrangement of agents in a 3D grid.
+```python
+# Define the PPO network
+make_networks_factory = ppo_networks.make_ppo_networks
 
-1.  **Import modules**:
-    ```python
-    from braxviewer.WebViewerBatched import WebViewerBatched
-    from braxviewer.brax.brax.envs.wrappers.viewer import ViewerWrapper
-    from braxviewer.brax.brax.training.agents.ppo import train as ppo
-    from brax.training.agents.ppo import networks as ppo_networks
-    # from your_project import YourBraxEnvironment # Import your custom env
-    ```
-
-2.  **Create the Batched Viewer and Wrap the Environment**:
-    `WebViewerBatched` only needs the number of environments and the base model XML.
-
-    ```python
-    num_parallel_envs = 8
-    
-    # Load your robot's XML model string. Examples can be found in the
-    # official Brax repository: https://github.com/google/brax/tree/main/brax/envs/assets
-    xml_model = "..." 
-
-    # Instantiate the batched viewer with the number of envs and the model
-    viewer = WebViewerBatched(
-        num_envs=num_parallel_envs,
-        xml=xml_model
-    )
-    viewer.run()
-
-    # Create an instance of your custom Brax environment
-    env_for_evaluation = YourBraxEnvironment(xml_model=xml_model)
-
-    # Wrap the environment to link it with the viewer
-    env_for_training = ViewerWrapper(env=env_for_evaluation, viewer=viewer)
-    ```
-
-3.  **Call the Training Function**:
-    The training happens on the original environment definition. The `ViewerWrapper` and Brax's training function handle the parallelization and visualization.
-
-    ```python
-    # Define the PPO network
-    make_networks_factory = ppo_networks.make_ppo_networks
-    
-    # Call the training function directly
-    make_policy_fn, params, _ = ppo.train(
-        environment=env_for_training,
-        eval_env=env_for_evaluation,
-        num_envs=num_parallel_envs,
-        num_timesteps=40000,
-        episode_length=300,
-        normalize_observations=True,
-        network_factory=make_networks_factory
-        # ... add other ppo parameters as needed
-    )
-    ```
+# Call the training function
+make_policy_fn, params, _ = ppo.train(
+    environment=env_for_visualization,
+    network_factory=make_networks_factory,
+    num_envs=num_parallel_envs,
+    wrap_env_fn=custom_wrap_env,
+)
+```

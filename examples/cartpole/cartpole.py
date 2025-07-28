@@ -9,13 +9,13 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 
 import jax
 import jax.numpy as jnp
-from braxviewer.brax.brax.io import mjcf
-from braxviewer.brax.brax.envs.base import PipelineEnv, State
+from brax.io import mjcf
+from brax.envs.base import PipelineEnv, State
 from braxviewer.WebViewerBatched import WebViewerBatched
-from braxviewer.brax.brax.training.agents.ppo import train as ppo
+from brax.training.agents.ppo import train as ppo
 from brax.training.agents.ppo import networks as ppo_networks
 from brax.envs.wrappers.training import VmapWrapper, EpisodeWrapper, AutoResetWrapper
-from braxviewer.brax.brax.envs.wrappers.viewer import ViewerWrapper
+from brax.envs.wrappers.viewer import ViewerWrapper
 
 # ==============================================================================
 #  Environment Definition
@@ -70,30 +70,23 @@ class CartPole(PipelineEnv):
     def get_observation(self, pipeline_state: State) -> jnp.ndarray:
         return jnp.concatenate([pipeline_state.q, pipeline_state.qd])
 
-def custom_wrap_env(env, episode_length=1000, action_repeat=1, randomization_fn=None):
-    env = VmapWrapper(env)
-    env = EpisodeWrapper(env, episode_length, action_repeat)
-    env = AutoResetWrapper(env)
-    return env
-
 # ==============================================================================
 #  Training
 # ==============================================================================
 
 if __name__ == '__main__':
     num_parallel_envs = 8
-    env_for_training = CartPole(xml_model=xml_model, backend='mjx')
+    env_for_evaluation = CartPole(xml_model=xml_model, backend='mjx')
 
     # Use default grid/offset (let WebViewerBatched auto-calculate)
     viewer = WebViewerBatched(
         num_envs=num_parallel_envs,
         xml=xml_model,
-        port=8081
     )
     viewer.run()
 
     # Wrap the environment with the ViewerWrapper to enable rendering.
-    env_for_training = ViewerWrapper(env=env_for_training, viewer=viewer)
+    env_for_training = ViewerWrapper(env=env_for_evaluation, viewer=viewer)
 
     make_networks_factory = ppo_networks.make_ppo_networks
 
@@ -103,7 +96,7 @@ if __name__ == '__main__':
 
     make_policy_fn, params, _ = ppo.train(
         environment=env_for_training,
-        eval_env=env_for_training,
+        eval_env=env_for_evaluation,
         num_timesteps=40000,
         num_evals=10,
         episode_length=300,
@@ -120,7 +113,6 @@ if __name__ == '__main__':
         network_factory=make_networks_factory,
         seed=0,
         wrap_env=True,
-        wrap_env_fn=custom_wrap_env,
         progress_fn=progress_fn,
     )
 

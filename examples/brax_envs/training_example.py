@@ -3,6 +3,8 @@ Using example from:
 https://colab.research.google.com/github/google/brax/blob/main/notebooks/training.ipynb
 """
 
+#TODO
+
 import sys
 import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -11,8 +13,8 @@ import jax
 from brax import envs
 
 from braxviewer.WebViewer import WebViewer
-from braxviewer.brax.training.agents.ppo import train as ppo
-from braxviewer.brax.training.agents.sac import train as sac
+from brax.training.agents.ppo import train as ppo
+from brax.training.agents.sac import train as sac
 
 env_name = 'humanoid'  # @param ['ant', 'halfcheetah', 'hopper', 'humanoid', 'humanoidstandup', 'inverted_pendulum', 'inverted_double_pendulum', 'pusher', 'reacher', 'walker2d']
 backend = 'positional'  # @param ['generalized', 'positional', 'spring']

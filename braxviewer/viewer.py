@@ -1,5 +1,5 @@
 
-from braxviewer.brax.brax.io import json
+from brax.io import json
 from brax.io import json
 import jax.numpy as jnp
 import jax
@@ -36,7 +36,7 @@ class Viewer:
         return logger
 
     def init(self, xml_string: str):
-        from braxviewer.brax.brax.io import mjcf
+        from brax.io import mjcf
         
         sys = mjcf.loads(xml_string)
 
@@ -46,7 +46,7 @@ class Viewer:
                 self.dt = sys.opt.timestep
             
             def reset(self, rng):
-                from braxviewer.brax.brax.envs.base import State
+                from brax.envs.base import State
                 q = jnp.zeros((self.sys.q_size(),))
                 qd = jnp.zeros((self.sys.qd_size(),))
                 pipeline_state = self.pipeline_init(q, qd)
@@ -54,9 +54,9 @@ class Viewer:
             
             def pipeline_init(self, q, qd):
                 # This logic is preserved from the original implementation
-                from braxviewer.brax.brax.positional import pipeline as positional_pipeline
-                from braxviewer.brax.brax.spring import pipeline as spring_pipeline
-                from braxviewer.brax.brax.generalized import pipeline as generalized_pipeline
+                from brax.positional import pipeline as positional_pipeline
+                from brax.spring import pipeline as spring_pipeline
+                from brax.generalized import pipeline as generalized_pipeline
                 try:
                     return positional_pipeline.init(self.sys, q, qd)
                 except:
