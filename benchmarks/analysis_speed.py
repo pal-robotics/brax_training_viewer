@@ -38,13 +38,10 @@ It supports large-scale batched environments and produces CSV, TXT, and figure o
 
 2. **Install Brax and BraxViewer**
 
-   - If you use the official Brax:
+   - Install the required Brax submodule (this viewer requires the custom Brax fork):
      ```bash
-     pip install brax
-     ```
-   - If you use a custom/forked Brax (with rendering callback support), install your local version:
-     ```bash
-     pip install -e braxviewer/brax
+     git submodule update --init --recursive
+     pip install -e brax/
      ```
    - For BraxViewer (this repo):
      ```bash
