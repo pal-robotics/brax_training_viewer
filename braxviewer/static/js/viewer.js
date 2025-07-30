@@ -134,7 +134,7 @@ class Viewer {
     // Add rendering toggle switch
     this.rendering = { enabled: true };
     const renderFolder = this.gui.addFolder('Real-time Rendering');
-    renderFolder.add(this.rendering, 'enabled').name('Enable')
+    this.renderToggle = renderFolder.add(this.rendering, 'enabled').name('Enable')
       .onChange((value) => {
         if (window.control_ws) {
             window.control_ws.send(JSON.stringify({ type: 'toggle_render', enabled: value }));
@@ -491,6 +491,11 @@ function setupControlWebSocket(viewer) {
 
     if (msg.type === 'refresh_web') {
       window.location.reload();
+    } else if (msg.type === 'set_render_state') {
+      if (viewer.renderToggle && viewer.rendering.enabled !== msg.enabled) {
+        viewer.rendering.enabled = msg.enabled;
+        viewer.renderToggle.updateDisplay();
+      }
     }
   };
 }

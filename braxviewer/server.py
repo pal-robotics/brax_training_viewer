@@ -13,13 +13,43 @@ import jinja2
 import json as std_json
 import logging
 
+class ConnectionManager:
+    """Manages active WebSocket connections for control signals."""
+    def __init__(self, viewer):
+        self.active_connections: list[WebSocket] = []
+        self.viewer = viewer
+
+    async def connect(self, websocket: WebSocket):
+        await websocket.accept()
+        self.active_connections.append(websocket)
+        # Send initial state upon connection
+        initial_state_msg = {
+            "type": "set_render_state",
+            "enabled": self.viewer.rendering_enabled
+        }
+        await websocket.send_text(std_json.dumps(initial_state_msg))
+
+    def disconnect(self, websocket: WebSocket):
+        self.active_connections.remove(websocket)
+
+    async def broadcast(self, message: dict):
+        disconnected_clients = []
+        for connection in self.active_connections:
+            try:
+                await connection.send_text(std_json.dumps(message))
+            except Exception:
+                disconnected_clients.append(connection)
+
+        for client in disconnected_clients:
+            self.disconnect(client)
+
 class Server:
     def __init__(self, viewer):
         self.viewer = viewer
         self.config = viewer.config
         self.app = FastAPI()
         self.clients_frame = set()
-        self.clients_control = set()
+        self.control_manager = ConnectionManager(viewer)
         self._setup_cors()
         self._setup_routes()
 
@@ -65,20 +95,26 @@ class Server:
 
         @self.app.websocket("/ws/control")
         async def websocket_control(websocket: WebSocket):
-            await websocket.accept()
-            self.clients_control.add(websocket)
+            await self.control_manager.connect(websocket)
             try:
                 while True:
                     data = await websocket.receive_text()
                     try:
                         msg = std_json.loads(data)
                         if msg.get('type') == 'toggle_render':
-                            self.viewer.rendering_enabled = bool(msg.get('enabled', False))
+                            is_enabled = bool(msg.get('enabled', False))
+                            self.viewer.rendering_enabled = is_enabled
                             self.viewer.log(f"Real-time rendering toggled to: {self.viewer.rendering_enabled}")
+                            
+                            # Broadcast the change to all clients
+                            await self.control_manager.broadcast({
+                                "type": "set_render_state",
+                                "enabled": is_enabled
+                            })
                     except Exception:
                         self.viewer.log(f"Invalid control message: {data}", level='warning')
             except WebSocketDisconnect:
-                self.clients_control.remove(websocket)
+                self.control_manager.disconnect(websocket)
 
     async def broadcast_to_frames(self, data: str):
         if not self.clients_frame:
