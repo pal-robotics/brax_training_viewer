@@ -4,8 +4,8 @@ import json as std_json
 import math
 from brax.envs.base import State
 
-from braxviewer.config import Config
-from braxviewer.server import Server
+from braxviewer.core.config import Config
+from braxviewer.core.server import Server
 from braxviewer.BraxSender import BraxSender
 
 class WebViewer:

@@ -16,13 +16,14 @@ keywords = [
 ]
 dependencies = [
     "asyncio>=3.4.3",
+    "brax>=0.12.4",
     "fastapi>=0.115.13",
     "uvicorn>=0.34.3",
     "websockets>=15.0.1",
 ]
 
 [tool.setuptools.packages.find]
-include = ["braxviewer"]
+include = ["braxviewer*"]
 
 [tool.setuptools.package-data]
-braxviewer = ["static/**/*"]
+braxviewer = ["static/**/*", "core/**/*", "utils/**/*"]

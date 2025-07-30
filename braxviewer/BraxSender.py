@@ -7,13 +7,13 @@ import threading
 import time
 from brax.envs.base import State
 
-from braxviewer.config import Config
-from braxviewer.Sender import Sender
+from braxviewer.core.config import Config
+from braxviewer.core.Sender import Sender
 
 class BraxSender(Sender):
     def __init__(self, config=None, **kwargs):
         if config is None:
-            from braxviewer.config import Config
+            from braxviewer.core.config import Config
             config = Config(**kwargs)
         super().__init__(config)
         self.config = config # Ensure type hint is for Config
@@ -81,6 +81,32 @@ class BraxSender(Sender):
     def stop(self):
         self._stop_polling = True
         super().stop()
+
+    def set_rendering_enabled(self, enabled: bool):
+        """Set rendering enabled state by updating the server via HTTP POST."""
+        try:
+            url = f"http://{self.config.host}:{self.config.port}/api/rendering_status"
+            data = {"rendering_enabled": enabled}
+            response = requests.post(url, json=data, timeout=5)
+            
+            if response.status_code == 200:
+                result = response.json()
+                if result.get("status") == "success":
+                    self.rendering_enabled = enabled
+                    self.log(f"Rendering status updated to: {enabled}")
+                    return True
+                else:
+                    self.log(f"Server returned error: {result.get('message', 'Unknown error')}", level="error")
+                    return False
+            else:
+                self.log(f"HTTP POST failed with status {response.status_code}: {response.text}", level="error")
+                return False
+        except requests.exceptions.ConnectionError:
+            self.log("Cannot connect to server to update rendering status", level="error")
+            return False
+        except Exception as e:
+            self.log(f"Failed to update rendering status: {e}", level="error")
+            return False
 
     def init(self):
         # BraxGridSender has a slightly different init flow

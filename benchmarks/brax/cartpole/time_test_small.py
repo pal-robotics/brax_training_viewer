@@ -22,8 +22,8 @@ from brax.training.agents.ppo import networks as ppo_networks
 from braxviewer.wrapper import ViewerWrapper
 
 # Configuration
-HOST = "127.0.0.1"
-BASE_PORT = 8000
+HOST = "0.0.0.0"
+BASE_PORT = 8090
 NUM_ENVS = 8
 
 XML_MODEL = """
@@ -127,16 +127,11 @@ def main():
             # Set rendering status and wait for it to take effect
             if render is False:
                 print("Disabling rendering...")
-                # Set the sender's rendering_enabled directly
-                sender.rendering_enabled = False
-                # Also set the viewer's rendering_enabled
-                viewer.rendering_enabled = False
-                # Wait for the status to propagate
+                sender.set_rendering_enabled(False)
                 wait_for_rendering_status(HOST, port, False)
             elif render is True:
                 print("Enabling rendering...")
-                sender.rendering_enabled = True
-                viewer.rendering_enabled = True
+                sender.set_rendering_enabled(True)
                 wait_for_rendering_status(HOST, port, True)
 
         start_time = time.time()

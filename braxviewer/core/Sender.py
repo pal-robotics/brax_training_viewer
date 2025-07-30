@@ -2,8 +2,8 @@ from brax.io import json
 from brax.io import json
 import jax.numpy as jnp
 import jax
-from braxviewer.StateStreamer import StateStreamer
-from braxviewer.config import Config
+from braxviewer.core.StateStreamer import StateStreamer
+from braxviewer.core.config import Config
 import logging
 import json as std_json
 

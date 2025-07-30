@@ -11,7 +11,7 @@ import jax
 import jax.numpy as jnp
 from brax.io import mjcf
 from brax.envs.base import PipelineEnv, State
-from brax.training.agents.ppo import train as ppo
+from braxviewer.brax.training.agents.ppo import train as ppo
 from brax.training.agents.ppo import networks as ppo_networks
 from braxviewer.wrapper import ViewerWrapper
 from braxviewer.BraxSender import BraxSender
@@ -64,8 +64,7 @@ if __name__ == '__main__':
         xml=config.XML_MODEL,
         num_envs=config.NUM_PARALLEL_ENVS
     )
-    sender.start()
-
+    sender.start()    
     # Wrap the environment with the ViewerWrapper to enable rendering.
     env_for_training = ViewerWrapper(env=env_for_evaluation, sender=sender)
 

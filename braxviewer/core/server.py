@@ -3,12 +3,12 @@ import asyncio
 import threading
 import time
 import uvicorn
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Request
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from etils import epath
-from braxviewer.html_utils import render_from_json
+from braxviewer.utils.html_utils import render_from_json
 import jinja2
 import json as std_json
 import logging
@@ -91,6 +91,28 @@ class Server:
         @self.app.get("/api/rendering_status")
         async def get_rendering_status():
             return {"rendering_enabled": self.sender.rendering_enabled}
+
+        @self.app.post("/api/rendering_status")
+        async def set_rendering_status(request: Request):
+            """Set rendering status and broadcast to all clients."""
+            try:
+                data = await request.json()
+                is_enabled = bool(data.get("rendering_enabled", True))
+                
+                # Update the sender's rendering status
+                self.sender.rendering_enabled = is_enabled
+                self.sender.log(f"Rendering status set to: {is_enabled}")
+                
+                # Broadcast the change to all control clients
+                await self.control_manager.broadcast({
+                    "type": "set_render_state",
+                    "enabled": is_enabled
+                })
+                
+                return {"status": "success", "rendering_enabled": is_enabled}
+            except Exception as e:
+                self.sender.log(f"Error setting rendering status: {e}", level="error")
+                return {"status": "error", "message": str(e)}
 
         @self.app.websocket("/ws/frame")
         async def websocket_endpoint(websocket: WebSocket):

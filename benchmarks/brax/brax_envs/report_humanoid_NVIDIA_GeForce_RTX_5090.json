@@ -1,0 +1,41 @@
+{
+    "hardware_info": {
+        "cpu_count": 128,
+        "memory_total_gb": 1133.54,
+        "gpus": [
+            {
+                "name": "NVIDIA GeForce RTX 5090",
+                "memory_total_mb": 32607
+            }
+        ]
+    },
+    "all_runs": [
+        {
+            "size_name": "small",
+            "num_envs": 64,
+            "benchmark_results": {
+                "No viewer": 94.48684191703796,
+                "Viewer OFF": 66.2929334640503,
+                "Viewer ON": 408.23094725608826
+            }
+        },
+        {
+            "size_name": "medium",
+            "num_envs": 256,
+            "benchmark_results": {
+                "No viewer": 75.04049754142761,
+                "Viewer OFF": 64.61105585098267,
+                "Viewer ON": 404.5826666355133
+            }
+        },
+        {
+            "size_name": "large",
+            "num_envs": 1024,
+            "benchmark_results": {
+                "No viewer": 68.93311929702759,
+                "Viewer OFF": 63.58159565925598,
+                "Viewer ON": 410.2497651576996
+            }
+        }
+    ]
+}

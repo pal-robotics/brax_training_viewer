@@ -418,33 +418,33 @@ function setupLiveFrameWebSocket(system, viewer) {
   viewerInstance = viewer;
   const ws = new WebSocket(`ws://${window.location.host}/ws/frame`);
 
-  // Add status light for live frame WS
-  const frameStatus = { status: 'Connecting' };
-  const frameFolder = viewer.gui.addFolder('Live Frame WS Status');
-  const frameCtrl = frameFolder.add(frameStatus, 'status').listen();
-  frameFolder.domElement.style.color = 'red';
-  frameFolder.close();
+  // Add unified status light for WebSocket connections
+  const wsStatus = { status: 'Connecting' };
+  const wsFolder = viewer.gui.addFolder('WebSocket Status');
+  const wsCtrl = wsFolder.add(wsStatus, 'status').listen();
+  wsFolder.domElement.style.color = 'red';
+  wsFolder.close();
 
-  function setFrameStatus(text, color) {
-    frameStatus.status = text;
-    frameCtrl.updateDisplay();
-    frameFolder.domElement.style.color = color;
+  function setWSStatus(text, color) {
+    wsStatus.status = text;
+    wsCtrl.updateDisplay();
+    wsFolder.domElement.style.color = color;
   }
 
   ws.onopen = () => {
     console.log('Connected to live frame WebSocket:', window.location.host);
-    setFrameStatus('Connected', 'green');
+    setWSStatus(`Connected to ${window.location.host}`, 'green');
   };
   ws.onmessage = (event) => {
     handleFrame(event.data);
   };
   ws.onclose = () => {
     console.log('WebSocket closed');
-    setFrameStatus('Disconnected', 'yellow');
+    setWSStatus('Disconnected', 'yellow');
   };
   ws.onerror = (e) => {
     console.error('WebSocket error:', e);
-    setFrameStatus('Error', 'red');
+    setWSStatus('Error', 'red');
   };
 }
 
@@ -452,30 +452,14 @@ function setupControlWebSocket(viewer) {
   const ws = new WebSocket(`ws://${window.location.host}/ws/control`);
   window.control_ws = ws; // Make ws globally accessible for the GUI callback
 
-  // Add status light for control WS
-  const controlStatus = { status: 'Connecting' };
-  const controlFolder = viewer.gui.addFolder('Control WS Status');
-  const controlCtrl = controlFolder.add(controlStatus, 'status').listen();
-  controlFolder.domElement.style.color = 'red';
-  controlFolder.close();
-
-  function setControlStatus(text, color) {
-    controlStatus.status = text;
-    controlCtrl.updateDisplay();
-    controlFolder.domElement.style.color = color;
-  }
-
   ws.onopen = () => {
     console.log('[Control] Connected');
-    setControlStatus('Connected', 'green');
   };
   ws.onclose = () => {
     console.warn('[Control] Disconnected');
-    setControlStatus('Disconnected', 'yellow');
   };
   ws.onerror = (e) => {
     console.error('[Control] Error:', e);
-    setControlStatus('Error', 'red');
   };
 
   ws.onmessage = (e) => {

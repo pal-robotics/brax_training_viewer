@@ -4,7 +4,7 @@ import queue
 import json as std_json
 import websockets
 
-from braxviewer.utils import state_to_dict
+from braxviewer.utils.utils import state_to_dict
 
 
 class StateStreamer:

@@ -1,5 +1,5 @@
 from brax.envs import Env, State, Wrapper
-from braxviewer.Sender import Sender
+from braxviewer.core.Sender import Sender
 import jax
 import jax.numpy as jnp
 

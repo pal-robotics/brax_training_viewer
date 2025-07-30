@@ -1,0 +1,41 @@
+{
+    "hardware_info": {
+        "cpu_count": 128,
+        "memory_total_gb": 503.53,
+        "gpus": [
+            {
+                "name": "NVIDIA RTX A5000",
+                "memory_total_mb": 24564
+            }
+        ]
+    },
+    "all_runs": [
+        {
+            "size_name": "small",
+            "num_envs": 64,
+            "benchmark_results": {
+                "No viewer": 105.14011406898499,
+                "Viewer OFF": 87.04667282104492,
+                "Viewer ON": 733.3763012886047
+            }
+        },
+        {
+            "size_name": "medium",
+            "num_envs": 256,
+            "benchmark_results": {
+                "No viewer": 90.02182126045227,
+                "Viewer OFF": 85.50020432472229,
+                "Viewer ON": 740.1087172031403
+            }
+        },
+        {
+            "size_name": "large",
+            "num_envs": 1024,
+            "benchmark_results": {
+                "No viewer": 89.6640522480011,
+                "Viewer OFF": 85.2942008972168,
+                "Viewer ON": 754.2491083145142
+            }
+        }
+    ]
+}
