@@ -1,48 +1,29 @@
-"""A demonstration of batched environment training with a web viewer."""
+"""A demonstration of batched environment training with a separated web viewer."""
 
 import sys
 import os
 import time
 
 # Add project path to sys.path to allow for relative imports.
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 
 import jax
 import jax.numpy as jnp
 from brax.io import mjcf
 from brax.envs.base import PipelineEnv, State
-from braxviewer.WebViewerParallel import WebViewerParallel
 from brax.training.agents.ppo import train as ppo
 from brax.training.agents.ppo import networks as ppo_networks
-from brax.envs.wrappers.viewer import ViewerWrapper
+from braxviewer.wrapper import ViewerWrapper
+from braxviewer.BraxSender import BraxSender
+import config
 
 # ==============================================================================
 #  Environment Definition
 # ==============================================================================
 
-xml_model = """
-<mujoco model="inverted pendulum">
-    <compiler inertiafromgeom="true"/>
-    <default><joint armature="0" damping="1"/><geom contype="0" conaffinity="0" friction="1 0.1 0.1"/></default>
-    <worldbody>
-        <light diffuse=".5 .5 .5" pos="0 0 3" dir="0 0 -1"/>
-        <body name="cart" pos="0 0 0">
-            <geom name="rail" type="capsule"  size="0.02 1.5" pos="0 0 0" quat="1 0 1 0" rgba="1 1 1 1"/>
-            <joint name="slider" type="slide" axis="1 0 0" pos="0 0 0" limited="true" range="-1.5 1.5"/>
-            <geom name="cart_geom" pos="0 0 0" quat="1 0 1 0" size="0.1 0.1" type="capsule"/>
-            <body name="pole" pos="0 0 0">
-                <joint name="hinge" type="hinge" axis="0 1 0" pos="0 0 0"/>
-                <geom name="pole_geom" type="capsule" size="0.049 0.3"  fromto="0 0 0 0.001 0 0.6"/>
-            </body>
-        </body>
-    </worldbody>
-    <actuator><motor ctrllimited="true" ctrlrange="-3 3" gear="100" joint="slider" name="slide"/></actuator>
-</mujoco>
-"""
-
 class CartPole(PipelineEnv):
-    def __init__(self, xml_model: str, backend: str = 'mjx', **kwargs):
-        sys = mjcf.loads(xml_model)
+    def __init__(self, backend: str = 'mjx', **kwargs):
+        sys = mjcf.loads(config.XML_MODEL)
         self.step_dt = 0.02
         n_frames = kwargs.pop('n_frames', int(self.step_dt / sys.opt.timestep))
         super().__init__(sys, backend=backend, n_frames=n_frames)
@@ -74,18 +55,19 @@ class CartPole(PipelineEnv):
 # ==============================================================================
 
 if __name__ == '__main__':
-    num_parallel_envs = 8
-    env_for_evaluation = CartPole(xml_model=xml_model, backend='mjx')
+    env_for_evaluation = CartPole(backend='mjx')
 
-    # Use default grid/offset (let WebViewerParallel auto-calculate)
-    viewer = WebViewerParallel(
-        num_envs=num_parallel_envs,
-        xml=xml_model,
+    # The sender connects to the already-running WebViewer server.
+    sender = BraxSender(
+        host=config.HOST,
+        port=config.PORT,
+        xml=config.XML_MODEL,
+        num_envs=config.NUM_PARALLEL_ENVS
     )
-    viewer.run()
+    sender.start()
 
     # Wrap the environment with the ViewerWrapper to enable rendering.
-    env_for_training = ViewerWrapper(env=env_for_evaluation, viewer=viewer)
+    env_for_training = ViewerWrapper(env=env_for_evaluation, sender=sender)
 
     make_networks_factory = ppo_networks.make_ppo_networks
 
@@ -96,30 +78,26 @@ if __name__ == '__main__':
     make_policy_fn, params, _ = ppo.train(
         environment=env_for_training,
         eval_env=env_for_evaluation,
-        num_timesteps=40000,
-        num_evals=10,
-        episode_length=300,
-        num_envs=num_parallel_envs,
-        num_eval_envs=num_parallel_envs,
-        batch_size=4,
-        num_minibatches=4,
-        unroll_length=20,
-        num_updates_per_batch=4,
-        normalize_observations=True,
-        discounting=0.97,
-        learning_rate=3.0e-4,
-        entropy_cost=1e-2,
+        num_timesteps=config.NUM_TIMESTEPS,
+        num_evals=config.NUM_EVALS,
+        episode_length=config.EPISODE_LENGTH,
+        num_envs=config.NUM_PARALLEL_ENVS,
+        num_eval_envs=config.NUM_PARALLEL_ENVS,
+        batch_size=config.BATCH_SIZE,
+        num_minibatches=config.NUM_MINIBATCHES,
+        unroll_length=config.UNROLL_LENGTH,
+        num_updates_per_batch=config.NUM_UPDATES_PER_BATCH,
+        normalize_observations=config.NORMALIZE_OBSERVATIONS,
+        discounting=config.DISCOUNTING,
+        learning_rate=config.LEARNING_RATE,
+        entropy_cost=config.ENTROPY_COST,
         network_factory=make_networks_factory,
-        seed=0,
+        seed=config.SEED,
         wrap_env=True,
         progress_fn=progress_fn,
     )
 
     print("--- Training Complete ---")
-
-    try:
-        while True:
-            time.sleep(1)
-    except KeyboardInterrupt:
-        viewer.stop()
-        print("Program stopped.")
+    print("Stopping sender...")
+    sender.stop()
+    print("Sender stopped.")

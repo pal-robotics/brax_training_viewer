@@ -336,8 +336,6 @@ let viewerInstance = null;
 function handleFrame(frameJson) {
   let parsed;
   try {
-    // The console log is in the user prompt, so we can be sure this is being called.
-    console.log(frameJson); 
     parsed = JSON.parse(frameJson);
   } catch (e) {
     console.error("JSON parse error:", e);
@@ -489,12 +487,18 @@ function setupControlWebSocket(viewer) {
       return;
     }
 
+    console.log('[Control] Received message:', msg);
+
     if (msg.type === 'refresh_web') {
       window.location.reload();
     } else if (msg.type === 'set_render_state') {
-      if (viewer.renderToggle && viewer.rendering.enabled !== msg.enabled) {
+      console.log('[Control] Setting render state to:', msg.enabled);
+      if (viewer.renderToggle) {
         viewer.rendering.enabled = msg.enabled;
         viewer.renderToggle.updateDisplay();
+        console.log('[Control] Updated render toggle to:', msg.enabled);
+      } else {
+        console.warn('[Control] renderToggle not found');
       }
     }
   };

@@ -70,7 +70,10 @@ read2. Create a viewer and wrap your environment with `ViewerWrapper`.
 ```python
 from braxviewer.WebViewerParallel import WebViewerParallel
 from brax.training.agents.ppo import train as ppo
-from brax.envs.wrappers.viewer import ViewerWrapper
+from brax.io import model
+from braxviewer.WebViewer import WebViewer
+from brax.envs.wrappers.training import EpisodeWrapper, AutoResetWrapper
+from braxviewer.wrapper import ViewerWrapper
 ```
 
 ### 2. Create Viewer and Wrap Environment

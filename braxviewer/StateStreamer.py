@@ -21,6 +21,11 @@ class StateStreamer:
         self._started = False
         self.unbatched = unbatched
 
+    @property
+    def connected(self):
+        """Returns the current connection status."""
+        return self._connected
+
     def start(self):
         """Starts the background thread that handles streaming."""
         if not self._started:
@@ -41,8 +46,7 @@ class StateStreamer:
         loop = asyncio.get_event_loop()
         while self._started:
             try:
-                async with websockets.connect(self.uri) as ws:
-                    # print("[WebSocket] Streamer connected.")
+                async with websockets.connect(self.uri, ping_interval=20, ping_timeout=10) as ws:
                     while True:
                         # Get an item from the synchronous queue in a non-blocking way.
                         item = await loop.run_in_executor(None, self._state_queue.get)
@@ -69,6 +73,9 @@ class StateStreamer:
             except Exception as e:
                 # print(f"[WebSocket] An unexpected error occurred: {e}")
                 break
+        
+        self._connected = False
+        print("[WebSocket] Streamer stopped.")
 
     def send(self, state, discard_queue: bool = False):
         """

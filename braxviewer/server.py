@@ -15,9 +15,9 @@ import logging
 
 class ConnectionManager:
     """Manages active WebSocket connections for control signals."""
-    def __init__(self, viewer):
+    def __init__(self, sender):
         self.active_connections: list[WebSocket] = []
-        self.viewer = viewer
+        self.sender = sender
 
     async def connect(self, websocket: WebSocket):
         await websocket.accept()
@@ -25,7 +25,7 @@ class ConnectionManager:
         # Send initial state upon connection
         initial_state_msg = {
             "type": "set_render_state",
-            "enabled": self.viewer.rendering_enabled
+            "enabled": self.sender.rendering_enabled
         }
         await websocket.send_text(std_json.dumps(initial_state_msg))
 
@@ -44,14 +44,33 @@ class ConnectionManager:
             self.disconnect(client)
 
 class Server:
-    def __init__(self, viewer):
-        self.viewer = viewer
-        self.config = viewer.config
+    def __init__(self, sender):
+        self.sender = sender
+        self.config = sender.config
         self.app = FastAPI()
         self.clients_frame = set()
-        self.control_manager = ConnectionManager(viewer)
+        self.control_manager = ConnectionManager(sender)
         self._setup_cors()
         self._setup_routes()
+        
+        # Disable logging for frequent status endpoint
+        self._disable_status_logging()
+
+    def _disable_status_logging(self):
+        """Disable logging for the frequent status endpoint."""
+        # Create a custom logging filter to exclude status endpoint logs
+        class StatusLogFilter(logging.Filter):
+            def filter(self, record):
+                # Filter out logs for /api/rendering_status endpoint
+                if hasattr(record, 'getMessage'):
+                    msg = record.getMessage()
+                    if '/api/rendering_status' in msg:
+                        return False
+                return True
+        
+        # Apply the filter to uvicorn access logs
+        uvicorn_logger = logging.getLogger("uvicorn.access")
+        uvicorn_logger.addFilter(StatusLogFilter())
 
     def _setup_cors(self):
         self.app.add_middleware(
@@ -65,33 +84,36 @@ class Server:
 
         @self.app.get("/", response_class=HTMLResponse)
         async def index():
-            if self.viewer.system_json:
-                return render_from_json(sys=self.viewer.system_json, height=480, colab=True, base_url=None)
-            else:
-                return self._get_waiting_html()
+            if self.sender.system_json:
+                return render_from_json(sys=self.sender.system_json, height=480, colab=True, base_url=None)
+            return self._get_waiting_html()
+
+        @self.app.get("/api/rendering_status")
+        async def get_rendering_status():
+            return {"rendering_enabled": self.sender.rendering_enabled}
 
         @self.app.websocket("/ws/frame")
         async def websocket_endpoint(websocket: WebSocket):
             await websocket.accept()
             # If this is the streamer, handle it separately.
             if websocket.query_params.get('is_streamer'):
-                self.viewer.log("Streamer connected to frame endpoint.")
+                self.sender.log("Streamer connected to frame endpoint.")
                 try:
                     while True:
                         data = await websocket.receive_text()
                         await self.broadcast_to_frames(data)
                 except WebSocketDisconnect:
-                    self.viewer.log("Streamer disconnected.", level='warning')
+                    self.sender.log("Streamer disconnected.", level='warning')
             else:
                 self.clients_frame.add(websocket)
-                self.viewer.log(f"New frame client connected. Total: {len(self.clients_frame)}")
+                self.sender.log(f"New frame client connected. Total: {len(self.clients_frame)}")
                 try:
                     # Keep connection open
                     while True:
                         await websocket.receive_text()
                 except WebSocketDisconnect:
                     self.clients_frame.remove(websocket)
-                    self.viewer.log(f"Frame client disconnected. Total: {len(self.clients_frame)}")
+                    self.sender.log(f"Frame client disconnected. Total: {len(self.clients_frame)}")
 
         @self.app.websocket("/ws/control")
         async def websocket_control(websocket: WebSocket):
@@ -103,8 +125,8 @@ class Server:
                         msg = std_json.loads(data)
                         if msg.get('type') == 'toggle_render':
                             is_enabled = bool(msg.get('enabled', False))
-                            self.viewer.rendering_enabled = is_enabled
-                            self.viewer.log(f"Real-time rendering toggled to: {self.viewer.rendering_enabled}")
+                            self.sender.rendering_enabled = is_enabled
+                            self.sender.log(f"Real-time rendering toggled to: {self.sender.rendering_enabled}")
                             
                             # Broadcast the change to all clients
                             await self.control_manager.broadcast({
@@ -112,7 +134,7 @@ class Server:
                                 "enabled": is_enabled
                             })
                     except Exception:
-                        self.viewer.log(f"Invalid control message: {data}", level='warning')
+                        self.sender.log(f"Invalid control message: {data}", level='warning')
             except WebSocketDisconnect:
                 self.control_manager.disconnect(websocket)
 
@@ -128,7 +150,7 @@ class Server:
             if isinstance(result, Exception):
                 client = list(self.clients_frame)[i]
                 self.clients_frame.remove(client)
-                self.viewer.log(f"Removed disconnected frame client. Total: {len(self.clients_frame)}")
+                self.sender.log(f"Removed disconnected frame client. Total: {len(self.clients_frame)}")
 
     def _get_waiting_html(self):
         # This HTML is largely unchanged
@@ -167,17 +189,17 @@ class Server:
         if use_thread:
             self._server_thread = threading.Thread(target=start_server, daemon=True)
             self._server_thread.start()
-            self.viewer.log(f"Brax Viewer starting on http://{self.config.host}:{self.config.port}")
-            self.viewer.log(f"Server log level: {self.config.server_log_level}")
+            self.sender.log(f"Brax Viewer starting on http://{self.config.host}:{self.config.port}")
+            self.sender.log(f"Server log level: {self.config.server_log_level}")
             time.sleep(wait_for_startup)
-            self.viewer.start() # Start the viewer's own processes (like the streamer)
+            self.sender.start() # Start the viewer's own processes (like the streamer)
             
             # After init, we should have system_json
-            if self.viewer.system_json:
+            if self.sender.system_json:
                 self.send_control({"type": "refresh_web"})
         else:
-            self.viewer.start()
+            self.sender.start()
             uvicorn.run(self.app, host=self.config.host, port=self.config.port, log_level=self.config.server_log_level)
 
     def stop(self):
-        self.viewer.stop() 
+        self.sender.stop() 

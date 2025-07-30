@@ -2,56 +2,21 @@ import jax.numpy as jnp
 import xml.etree.ElementTree as ET
 import json as std_json
 import math
+import requests
+import threading
+import time
 from brax.envs.base import State
 
-from braxviewer.config import BatchedViewerConfig
-from braxviewer.viewer import Viewer
-from braxviewer.server import Server
+from braxviewer.config import Config
+from braxviewer.Sender import Sender
 
-class WebViewerParallel:
-    def __init__(self,
-                 host: str = "127.0.0.1",
-                 port: int = 8000,
-                 log_level: str = "info",
-                 server_log_level: str = "warning",
-                 **kwargs):
-
-        self.config = BatchedViewerConfig(host=host, port=port, log_level=log_level,
-                                          server_log_level=server_log_level, **kwargs)
-        
-        # The batched viewer will have its own specialized viewer instance
-        self.viewer = BatchedViewer(self.config)
-        self.server = Server(self.viewer)
-        
-        self.viewer.init()
-
-    def run(self, use_thread: bool = True, wait_for_startup: int = 2):
-        self.server.run(use_thread=use_thread, wait_for_startup=wait_for_startup)
-
-    def stop(self):
-        self.server.stop()
-
-    def send_frame(self, state: State, env_id: int = 0):
-        self.viewer.send_frame(state, env_id)
-        
-    def stitch_state(self, batched_state: State) -> State:
-        return self.viewer.stitch_state(batched_state)
-
-    def log(self, message: str, level: str = "info"):
-        self.viewer.log(message, level)
-
-    @property
-    def rendering_enabled(self):
-        return self.viewer.rendering_enabled
-
-    @rendering_enabled.setter
-    def rendering_enabled(self, value):
-        self.viewer.rendering_enabled = value
-
-class BatchedViewer(Viewer):
-    def __init__(self, config: BatchedViewerConfig):
+class BraxSender(Sender):
+    def __init__(self, config=None, **kwargs):
+        if config is None:
+            from braxviewer.config import Config
+            config = Config(**kwargs)
         super().__init__(config)
-        self.config = config # Ensure type hint is for BatchedViewerConfig
+        self.config = config # Ensure type hint is for Config
         
         if self.config.grid_dims is None:
             if self.config.num_envs is None:
@@ -64,9 +29,61 @@ class BatchedViewer(Viewer):
             self.log(f"Auto-calculated env_offset: {self.config.env_offset}")
 
         self.concatenated_xml = self._concatenate_envs_xml()
+        
+        # Start status polling thread
+        self._status_thread = None
+        self._stop_polling = False
+
+    def _poll_rendering_status(self):
+        """Poll the server for rendering status updates."""
+        last_status = None
+        consecutive_failures = 0
+        
+        while not self._stop_polling:
+            try:
+                url = f"http://{self.config.host}:{self.config.port}/api/rendering_status"
+                response = requests.get(url, timeout=1)
+                if response.status_code == 200:
+                    data = response.json()
+                    server_rendering_enabled = data.get("rendering_enabled", True)
+                    
+                    # Only log when status actually changes
+                    if server_rendering_enabled != self.rendering_enabled:
+                        self.rendering_enabled = server_rendering_enabled
+                        self.log(f"Rendering status updated to: {self.rendering_enabled}")
+                    
+                    # Reset failure counter on success
+                    consecutive_failures = 0
+                    
+                else:
+                    consecutive_failures += 1
+                    
+            except Exception as e:
+                consecutive_failures += 1
+                # Only log after multiple consecutive failures
+                if consecutive_failures == 5:
+                    self.log(f"Server connection issues (attempt {consecutive_failures})", level="warning")
+                elif consecutive_failures == 20:
+                    self.log(f"Server still unavailable after {consecutive_failures} attempts", level="warning")
+            
+            # Increase polling interval on failures
+            if consecutive_failures > 10:
+                time.sleep(5.0)  # 5 seconds when having issues
+            else:
+                time.sleep(1.0)  # 1 second normally  # Poll every 1 second
+
+    def start(self):
+        super().start()
+        # Start status polling
+        self._status_thread = threading.Thread(target=self._poll_rendering_status, daemon=True)
+        self._status_thread.start()
+
+    def stop(self):
+        self._stop_polling = True
+        super().stop()
 
     def init(self):
-        # BatchedViewer has a slightly different init flow
+        # BraxGridSender has a slightly different init flow
         super().init(self.concatenated_xml)
 
     def send_frame(self, state: State, env_id: int = 0):
@@ -181,7 +198,6 @@ class BatchedViewer(Viewer):
 
             geom_type = geom.get('type')
 
-            # Ignore planes for a more accurate agent-focused bounding box
             if geom_type == 'plane':
                 return
             
@@ -280,4 +296,4 @@ class BatchedViewer(Viewer):
                     if "joint" in new_actuator.attrib: new_actuator.set("joint", f"{new_actuator.attrib['joint']}_{i}")
                     actuator_root.append(new_actuator)
 
-        return ET.tostring(root, encoding="unicode")
+        return ET.tostring(root, encoding="unicode") 

@@ -1,15 +1,14 @@
-
 from brax.io import json
 from brax.io import json
 import jax.numpy as jnp
 import jax
 from braxviewer.StateStreamer import StateStreamer
-from braxviewer.config import ViewerConfig
+from braxviewer.config import Config
 import logging
 import json as std_json
 
-class Viewer:
-    def __init__(self, config: ViewerConfig):
+class Sender:
+    def __init__(self, config: Config):
         self.config = config
         self.system_json = None
         self.rendering_enabled = True
@@ -20,7 +19,7 @@ class Viewer:
         self.logger = self._setup_logger()
 
     def _setup_logger(self):
-        logger = logging.getLogger("brax.viewer")
+        logger = logging.getLogger("brax.sender")
         if not logger.handlers:
             handler = logging.StreamHandler()
             formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -102,7 +101,7 @@ class Viewer:
 
     def start(self):
         self.streamer.start()
-        self.logger.info(f"Brax Viewer streamer initialized.")
+        self.logger.info(f"Brax Sender streamer initialized.")
         self.logger.info(f"Application log level: {self.config.log_level}")
 
     def stop(self):

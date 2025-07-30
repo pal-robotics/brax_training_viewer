@@ -9,10 +9,13 @@ import functools
 import jax
 from brax import envs
 
-from braxviewer.WebViewerParallel import WebViewerParallel
+from brax.envs import ant
+from brax.io import model
+from braxviewer.WebViewer import WebViewer
+from brax.envs.wrappers.training import EpisodeWrapper, AutoResetWrapper
+from braxviewer.wrapper import ViewerWrapper
 from brax.training.agents.ppo import train as ppo
 from brax.training.agents.sac import train as sac
-from brax.envs.wrappers.viewer import ViewerWrapper
 from etils import epath
 
 env_name = 'humanoid_simplfied'  # @param ['ant', 'halfcheetah', 'hopper', 'humanoid', 'humanoidstandup', 'inverted_pendulum', 'inverted_double_pendulum', 'pusher', 'reacher', 'walker2d']
@@ -52,7 +55,7 @@ if __name__ == "__main__":
     num_envs = train_fn.keywords.get('num_envs', 8)  # default fallback
     
     # Create viewer for parallel environments
-    viewer = WebViewerParallel(
+    viewer = WebViewer(
         num_envs=num_envs,
         xml=xml_string,
     )
@@ -60,7 +63,7 @@ if __name__ == "__main__":
 
     # Create separate environments for training and evaluation
     env_for_evaluation = env  # Original environment for evaluation
-    env_for_training = ViewerWrapper(env=env, viewer=viewer)  # Wrapped environment for training
+    env_for_training = ViewerWrapper(env=env, sender=viewer)  # Wrapped environment for training
 
     # Start training
     make_inference_fn, params, _ = train_fn(
