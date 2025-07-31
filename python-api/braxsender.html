@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>HTML Utils &#8212; Brax Viewer</title>
+    <title>BraxSender &#8212; Brax Viewer</title>
   
   
   
@@ -32,7 +32,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=eba8b062" />
     <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css?v=6644e6bb" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
   
@@ -57,12 +57,12 @@
     <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'api/html-utils';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'python-api/braxsender';</script>
     <link rel="icon" href="../_static/favicon.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Utils" href="utils.html" />
-    <link rel="prev" title="Sender" href="sender.html" />
+    <link rel="next" title="ViewerWrapper" href="viewerwrapper.html" />
+    <link rel="prev" title="WebViewer" href="webviewer.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -191,20 +191,22 @@
 <li class="toctree-l1 has-children"><a class="reference internal" href="../web-api.html">Web API</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../web-api/http-endpoints.html">HTTP Endpoints</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../web-api/websocket-endpoints.html">WebSocket Endpoints</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../web-api/error-handling.html">Error Handling</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="../python-api.html">Python API</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="webviewer.html">WebViewer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="braxsender.html">BraxSender</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">BraxSender</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viewerwrapper.html">ViewerWrapper</a></li>
-<li class="toctree-l2"><a class="reference internal" href="config.html">Config</a></li>
-<li class="toctree-l2"><a class="reference internal" href="server.html">Server</a></li>
-<li class="toctree-l2"><a class="reference internal" href="connectionmanager.html">ConnectionManager</a></li>
-<li class="toctree-l2"><a class="reference internal" href="statestreamer.html">StateStreamer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="sender.html">Sender</a></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">HTML Utils</a></li>
-<li class="toctree-l2"><a class="reference internal" href="utils.html">Utils</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../internal.html">Internal Implementation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../internal/config.html">Config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../internal/server.html">Server</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../internal/connectionmanager.html">ConnectionManager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../internal/statestreamer.html">StateStreamer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../internal/sender.html">Sender</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../internal/html-utils.html">HTML Utils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../internal/utils.html">Utils</a></li>
 </ul>
 </details></li>
 </ul>
@@ -278,7 +280,7 @@
       
       
       
-      <li><a href="https://github.com/pal-robotics/brax_training_viewer/issues/new?title=Issue%20on%20page%20%2Fapi/html-utils.html&body=Your%20issue%20content%20here." target="_blank"
+      <li><a href="https://github.com/pal-robotics/brax_training_viewer/issues/new?title=Issue%20on%20page%20%2Fpython-api/braxsender.html&body=Your%20issue%20content%20here." target="_blank"
    class="btn btn-sm btn-source-issues-button dropdown-item"
    title="Open an issue"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -308,7 +310,7 @@
       
       
       
-      <li><a href="../_sources/api/html-utils.md" target="_blank"
+      <li><a href="../_sources/python-api/braxsender.md" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -392,7 +394,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>HTML Utils</h1>
+    <h1>BraxSender</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -403,10 +405,19 @@ document.write(`
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#purpose">Purpose</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#functions">Functions</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#render-from-json-sys-str-height-union-int-str-colab-bool-base-url-optional-str-str">render_from_json(sys: str, height: Union[int, str], colab: bool, base_url: Optional[str]) -&gt; str</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#render-sys-system-states-list-state-height-union-int-str-480-colab-bool-true-base-url-optional-str-none-str">render(sys: System, states: List[State], height: Union[int, str] = 480, colab: bool = True, base_url: Optional[str] = None) -&gt; str</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#save-path-str-sys-system-states-list-state">save(path: str, sys: System, states: List[State])</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#constructor">Constructor</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#parameters">Parameters</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#methods">Methods</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#start">start()</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#stop">stop()</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#init">init()</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#send-frame-state-state-env-id-int-0">send_frame(state: State, env_id: int = 0)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#stitch-state-batched-state-state-state">stitch_state(batched_state: State) -&gt; State</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#set-rendering-enabled-enabled-bool">set_rendering_enabled(enabled: bool)</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#properties">Properties</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#rendering-enabled">rendering_enabled</a></li>
 </ul>
 </li>
 </ul>
@@ -420,55 +431,84 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="html-utils">
-<h1>HTML Utils<a class="headerlink" href="#html-utils" title="Link to this heading">#</a></h1>
-<p>Utilities for HTML rendering and visualization.</p>
+  <section class="tex2jax_ignore mathjax_ignore" id="braxsender">
+<h1>BraxSender<a class="headerlink" href="#braxsender" title="Link to this heading">#</a></h1>
+<p>Handles serialization and communication with the web viewer server.</p>
 <section id="purpose">
 <h2>Purpose<a class="headerlink" href="#purpose" title="Link to this heading">#</a></h2>
-<p>HTML utils provide functions for generating HTML content for the BraxViewer web interface. These functions handle system serialization, template rendering, and HTML file generation.</p>
+<p>BraxSender manages the communication between the training process and the web viewer server. It handles state serialization, frame transmission, and status polling. It also provides automatic reconnection and error handling for network issues.</p>
 </section>
-<section id="functions">
-<h2>Functions<a class="headerlink" href="#functions" title="Link to this heading">#</a></h2>
-<section id="render-from-json-sys-str-height-union-int-str-colab-bool-base-url-optional-str-str">
-<h3>render_from_json(sys: str, height: Union[int, str], colab: bool, base_url: Optional[str]) -&gt; str<a class="headerlink" href="#render-from-json-sys-str-height-union-int-str-colab-bool-base-url-optional-str-str" title="Link to this heading">#</a></h3>
-<p>Render HTML from JSON system string.</p>
+<section id="constructor">
+<h2>Constructor<a class="headerlink" href="#constructor" title="Link to this heading">#</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">BraxSender</span><span class="p">(</span>
+    <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">config</span></code>: Optional Config object</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">**kwargs</span></code>: Configuration parameters if config is not provided</p></li>
+</ul>
+</section>
+<section id="methods">
+<h2>Methods<a class="headerlink" href="#methods" title="Link to this heading">#</a></h2>
+<section id="start">
+<h3>start()<a class="headerlink" href="#start" title="Link to this heading">#</a></h3>
+<p>Start the sender and status polling thread.</p>
+</section>
+<section id="stop">
+<h3>stop()<a class="headerlink" href="#stop" title="Link to this heading">#</a></h3>
+<p>Stop the sender and cleanup resources.</p>
+</section>
+<section id="init">
+<h3>init()<a class="headerlink" href="#init" title="Link to this heading">#</a></h3>
+<p>Initialize the sender with system configuration.</p>
+</section>
+<section id="send-frame-state-state-env-id-int-0">
+<h3>send_frame(state: State, env_id: int = 0)<a class="headerlink" href="#send-frame-state-state-env-id-int-0" title="Link to this heading">#</a></h3>
+<p>Send a frame to the server.</p>
 <p><strong>Parameters:</strong></p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">sys</span></code> (str): JSON string representation of the system</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">height</span></code> (Union[int, str]): Height of the render window</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">colab</span></code> (bool): Whether to use CSS styles for colab</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">base_url</span></code> (Optional[str]): Base URL for serving visualizer files</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">state</span></code> (State): Brax environment state to send</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">env_id</span></code> (int): Environment ID for batched environments (default: 0)</p></li>
+</ul>
+</section>
+<section id="stitch-state-batched-state-state-state">
+<h3>stitch_state(batched_state: State) -&gt; State<a class="headerlink" href="#stitch-state-batched-state-state-state" title="Link to this heading">#</a></h3>
+<p>Convert batched state to single state.</p>
+<p><strong>Parameters:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">batched_state</span></code> (State): Batched state from environment</p></li>
 </ul>
 <p><strong>Returns:</strong></p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">str</span></code>: HTML string for the visualizer</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">State</span></code>: Single environment state</p></li>
 </ul>
 </section>
-<section id="render-sys-system-states-list-state-height-union-int-str-480-colab-bool-true-base-url-optional-str-none-str">
-<h3>render(sys: System, states: List[State], height: Union[int, str] = 480, colab: bool = True, base_url: Optional[str] = None) -&gt; str<a class="headerlink" href="#render-sys-system-states-list-state-height-union-int-str-480-colab-bool-true-base-url-optional-str-none-str" title="Link to this heading">#</a></h3>
-<p>Render HTML from system and states.</p>
+<section id="set-rendering-enabled-enabled-bool">
+<h3>set_rendering_enabled(enabled: bool)<a class="headerlink" href="#set-rendering-enabled-enabled-bool" title="Link to this heading">#</a></h3>
+<p>Set rendering state via HTTP API.</p>
 <p><strong>Parameters:</strong></p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">sys</span></code> (System): Brax system object</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">states</span></code> (List[State]): List of system states to render</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">height</span></code> (Union[int, str]): Height of the render window (default: 480)</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">colab</span></code> (bool): Whether to use CSS styles for colab (default: True)</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">base_url</span></code> (Optional[str]): Base URL for serving visualizer files (default: None)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">enabled</span></code> (bool): Whether rendering should be enabled</p></li>
 </ul>
 <p><strong>Returns:</strong></p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">str</span></code>: HTML string for the visualizer</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bool</span></code>: Success status</p></li>
 </ul>
 </section>
-<section id="save-path-str-sys-system-states-list-state">
-<h3>save(path: str, sys: System, states: List[State])<a class="headerlink" href="#save-path-str-sys-system-states-list-state" title="Link to this heading">#</a></h3>
-<p>Save trajectory as HTML file.</p>
-<p><strong>Parameters:</strong></p>
-<ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">path</span></code> (str): File path to save the HTML</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">sys</span></code> (System): Brax system object</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">states</span></code> (List[State]): List of system states to save</p></li>
-</ul>
+</section>
+<section id="properties">
+<h2>Properties<a class="headerlink" href="#properties" title="Link to this heading">#</a></h2>
+<section id="rendering-enabled">
+<h3>rendering_enabled<a class="headerlink" href="#rendering-enabled" title="Link to this heading">#</a></h3>
+<p>Get or set the rendering enabled state.</p>
+<p><strong>Type:</strong> bool</p>
+<p><strong>Access:</strong> Read/Write</p>
 </section>
 </section>
 </section>
@@ -486,7 +526,7 @@ document.write(`
         },
         kernelOptions: {
             name: "python3",
-            path: "./api"
+            path: "./python-api"
         },
         predefinedOutput: true
     }
@@ -504,20 +544,20 @@ document.write(`
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="sender.html"
+       href="webviewer.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Sender</p>
+        <p class="prev-next-title">WebViewer</p>
       </div>
     </a>
     <a class="right-next"
-       href="utils.html"
+       href="viewerwrapper.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Utils</p>
+        <p class="prev-next-title">ViewerWrapper</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -538,10 +578,19 @@ document.write(`
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#purpose">Purpose</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#functions">Functions</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#render-from-json-sys-str-height-union-int-str-colab-bool-base-url-optional-str-str">render_from_json(sys: str, height: Union[int, str], colab: bool, base_url: Optional[str]) -&gt; str</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#render-sys-system-states-list-state-height-union-int-str-480-colab-bool-true-base-url-optional-str-none-str">render(sys: System, states: List[State], height: Union[int, str] = 480, colab: bool = True, base_url: Optional[str] = None) -&gt; str</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#save-path-str-sys-system-states-list-state">save(path: str, sys: System, states: List[State])</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#constructor">Constructor</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#parameters">Parameters</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#methods">Methods</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#start">start()</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#stop">stop()</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#init">init()</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#send-frame-state-state-env-id-int-0">send_frame(state: State, env_id: int = 0)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#stitch-state-batched-state-state-state">stitch_state(batched_state: State) -&gt; State</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#set-rendering-enabled-enabled-bool">set_rendering_enabled(enabled: bool)</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#properties">Properties</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#rendering-enabled">rendering_enabled</a></li>
 </ul>
 </li>
 </ul>

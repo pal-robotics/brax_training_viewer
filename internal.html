@@ -2,13 +2,13 @@
 <!DOCTYPE html>
 
 
-<html lang="en" data-content_root="../" >
+<html lang="en" data-content_root="./" >
 
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>ViewerWrapper &#8212; Brax Viewer</title>
+    <title>Internal Implementation &#8212; Brax Viewer</title>
   
   
   
@@ -18,51 +18,51 @@
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link href="_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
 
   
-  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+  <link href="_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
-    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=eba8b062" />
-    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
-    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css?v=6644e6bb" />
-    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
-    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css?v=eba8b062" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
-  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
-    <script src="../_static/doctools.js?v=9a2dae69"></script>
-    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
-    <script src="../_static/copybutton.js?v=f281be69"></script>
-    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script src="_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    <script src="_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
     <script>let toggleHintShow = 'Click to show';</script>
     <script>let toggleHintHide = 'Click to hide';</script>
     <script>let toggleOpenOnPrint = 'true';</script>
-    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script src="_static/togglebutton.js?v=4a39c7ea"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
-    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script src="_static/design-tabs.js?v=f930bc37"></script>
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
-    <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script async="async" src="_static/sphinx-thebe.js?v=c100c467"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'api/viewerwrapper';</script>
-    <link rel="icon" href="../_static/favicon.ico"/>
-    <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Config" href="config.html" />
-    <link rel="prev" title="BraxSender" href="braxsender.html" />
+    <script>DOCUMENTATION_OPTIONS.pagename = 'internal';</script>
+    <link rel="icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Config" href="internal/config.html" />
+    <link rel="prev" title="ViewerWrapper" href="python-api/viewerwrapper.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -94,7 +94,7 @@
     <div class="search-button__overlay"></div>
     <div class="search-button__search-container">
 <form class="bd-search d-flex align-items-center"
-      action="../search.html"
+      action="search.html"
       method="get">
   <i class="fa-solid fa-magnifying-glass"></i>
   <input type="search"
@@ -143,7 +143,7 @@
     
   
 
-<a class="navbar-brand logo" href="../intro.html">
+<a class="navbar-brand logo" href="intro.html">
   
   
   
@@ -154,8 +154,8 @@
       
     
     
-    <img src="../_static/name.webp" class="logo__image only-light" alt="Brax Viewer - Home"/>
-    <script>document.write(`<img src="../_static/name.webp" class="logo__image only-dark" alt="Brax Viewer - Home"/>`);</script>
+    <img src="_static/name.webp" class="logo__image only-light" alt="Brax Viewer - Home"/>
+    <script>document.write(`<img src="_static/name.webp" class="logo__image only-dark" alt="Brax Viewer - Home"/>`);</script>
   
   
 </a></div>
@@ -175,36 +175,38 @@
         
         <ul class="nav bd-sidenav bd-sidenav__home-link">
             <li class="toctree-l1">
-                <a class="reference internal" href="../intro.html">
+                <a class="reference internal" href="intro.html">
                     Overview
                 </a>
             </li>
         </ul>
         <ul class="current nav bd-sidenav">
-<li class="toctree-l1 has-children"><a class="reference internal" href="../installation.html">Installation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="../installation-pip.html">Pip Installation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../installation-uv.html">UV Installation</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="installation.html">Installation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="installation-pip.html">Pip Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation-uv.html">UV Installation</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1"><a class="reference internal" href="../quick-start.html">Quick Start</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../usage-guide.html">Usage Guide</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../web-api.html">Web API</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="../web-api/http-endpoints.html">HTTP Endpoints</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../web-api/websocket-endpoints.html">WebSocket Endpoints</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../web-api/error-handling.html">Error Handling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quick-start.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage-guide.html">Usage Guide</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="web-api.html">Web API</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="web-api/http-endpoints.html">HTTP Endpoints</a></li>
+<li class="toctree-l2"><a class="reference internal" href="web-api/websocket-endpoints.html">WebSocket Endpoints</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1 current active has-children"><a class="reference internal" href="../python-api.html">Python API</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="webviewer.html">WebViewer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="braxsender.html">BraxSender</a></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">ViewerWrapper</a></li>
-<li class="toctree-l2"><a class="reference internal" href="config.html">Config</a></li>
-<li class="toctree-l2"><a class="reference internal" href="server.html">Server</a></li>
-<li class="toctree-l2"><a class="reference internal" href="connectionmanager.html">ConnectionManager</a></li>
-<li class="toctree-l2"><a class="reference internal" href="statestreamer.html">StateStreamer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="sender.html">Sender</a></li>
-<li class="toctree-l2"><a class="reference internal" href="html-utils.html">HTML Utils</a></li>
-<li class="toctree-l2"><a class="reference internal" href="utils.html">Utils</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="python-api.html">Python API</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="python-api/webviewer.html">WebViewer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="python-api/braxsender.html">BraxSender</a></li>
+<li class="toctree-l2"><a class="reference internal" href="python-api/viewerwrapper.html">ViewerWrapper</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="current reference internal" href="#">Internal Implementation</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="internal/config.html">Config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="internal/server.html">Server</a></li>
+<li class="toctree-l2"><a class="reference internal" href="internal/connectionmanager.html">ConnectionManager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="internal/statestreamer.html">StateStreamer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="internal/sender.html">Sender</a></li>
+<li class="toctree-l2"><a class="reference internal" href="internal/html-utils.html">HTML Utils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="internal/utils.html">Utils</a></li>
 </ul>
 </details></li>
 </ul>
@@ -278,7 +280,7 @@
       
       
       
-      <li><a href="https://github.com/pal-robotics/brax_training_viewer/issues/new?title=Issue%20on%20page%20%2Fapi/viewerwrapper.html&body=Your%20issue%20content%20here." target="_blank"
+      <li><a href="https://github.com/pal-robotics/brax_training_viewer/issues/new?title=Issue%20on%20page%20%2Finternal.html&body=Your%20issue%20content%20here." target="_blank"
    class="btn btn-sm btn-source-issues-button dropdown-item"
    title="Open an issue"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -308,7 +310,7 @@
       
       
       
-      <li><a href="../_sources/api/viewerwrapper.md" target="_blank"
+      <li><a href="_sources/internal.md" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -392,7 +394,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>ViewerWrapper</h1>
+    <h1>Internal Implementation</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -402,17 +404,14 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#purpose">Purpose</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#constructor">Constructor</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#parameters">Parameters</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#properties">Properties</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#should-render">should_render</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#overview">Overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#components">Components</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#core-infrastructure">Core Infrastructure</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#data-processing">Data Processing</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#rendering">Rendering</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#methods">Methods</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#render-fn-state-state">render_fn(state: State)</a></li>
-</ul>
-</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#developer-notes">Developer Notes</a></li>
 </ul>
             </nav>
         </div>
@@ -424,50 +423,51 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="viewerwrapper">
-<h1>ViewerWrapper<a class="headerlink" href="#viewerwrapper" title="Link to this heading">#</a></h1>
-<p>A Brax environment wrapper that enables real-time rendering during training.</p>
-<section id="purpose">
-<h2>Purpose<a class="headerlink" href="#purpose" title="Link to this heading">#</a></h2>
-<p>ViewerWrapper wraps a Brax environment to add real-time rendering capabilities. It intercepts environment steps and sends state updates to the viewer server when rendering is enabled. This allows for seamless integration with existing training loops.</p>
+  <section class="tex2jax_ignore mathjax_ignore" id="internal-implementation">
+<h1>Internal Implementation<a class="headerlink" href="#internal-implementation" title="Link to this heading">#</a></h1>
+<p>This section contains documentation for the internal implementation of braxviewer. These components are not intended for direct use by end users, but are documented here for developers who need to understand or extend the library.</p>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading">#</a></h2>
+<p>The internal implementation is organized into several key components:</p>
+<ul class="simple">
+<li><p><strong>Configuration Management</strong>: Core configuration classes and settings</p></li>
+<li><p><strong>Network Layer</strong>: WebSocket streaming, server management, and connection handling</p></li>
+<li><p><strong>Data Processing</strong>: State conversion, serialization, and utility functions</p></li>
+<li><p><strong>Rendering Pipeline</strong>: HTML generation and visualization utilities</p></li>
+</ul>
 </section>
-<section id="constructor">
-<h2>Constructor<a class="headerlink" href="#constructor" title="Link to this heading">#</a></h2>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ViewerWrapper</span><span class="p">(</span>
-    <span class="n">env</span><span class="p">:</span> <span class="n">Env</span><span class="p">,</span>
-    <span class="n">sender</span><span class="p">:</span> <span class="n">Sender</span>
-<span class="p">)</span>
-</pre></div>
+<section id="components">
+<h2>Components<a class="headerlink" href="#components" title="Link to this heading">#</a></h2>
+<section id="core-infrastructure">
+<h3>Core Infrastructure<a class="headerlink" href="#core-infrastructure" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p><a class="reference internal" href="internal/config.html"><span class="std std-doc">Config</span></a> - Configuration management and settings</p></li>
+<li><p><a class="reference internal" href="internal/server.html"><span class="std std-doc">Server</span></a> - FastAPI web server implementation</p></li>
+<li><p><a class="reference internal" href="internal/connectionmanager.html"><span class="std std-doc">ConnectionManager</span></a> - WebSocket connection management</p></li>
+</ul>
+</section>
+<section id="data-processing">
+<h3>Data Processing<a class="headerlink" href="#data-processing" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p><a class="reference internal" href="internal/statestreamer.html"><span class="std std-doc">StateStreamer</span></a> - Real-time data streaming</p></li>
+<li><p><a class="reference internal" href="internal/sender.html"><span class="std std-doc">Sender</span></a> - Base data sending functionality</p></li>
+<li><p><a class="reference internal" href="internal/utils.html"><span class="std std-doc">Utils</span></a> - State conversion and utility functions</p></li>
+</ul>
+</section>
+<section id="rendering">
+<h3>Rendering<a class="headerlink" href="#rendering" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p><a class="reference internal" href="internal/html-utils.html"><span class="std std-doc">HTML Utils</span></a> - HTML generation and template rendering</p></li>
+</ul>
+</section>
+</section>
+<section id="developer-notes">
+<h2>Developer Notes<a class="headerlink" href="#developer-notes" title="Link to this heading">#</a></h2>
+<p>These components are designed to work together to provide the high-level user interface. If you’re extending braxviewer, understanding these components will help you integrate new features effectively.</p>
+<p>For most use cases, the <a class="reference internal" href="python-api.html"><span class="std std-doc">Python API</span></a> provides all the functionality you need.</p>
+</section>
+<div class="toctree-wrapper compound">
 </div>
-</section>
-<section id="parameters">
-<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading">#</a></h2>
-<ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">env</span></code>: The Brax environment to wrap</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">sender</span></code>: A sender instance (e.g., BraxSender) with <code class="docutils literal notranslate"><span class="pre">send_frame</span></code> method and <code class="docutils literal notranslate"><span class="pre">rendering_enabled</span></code> property</p></li>
-</ul>
-</section>
-<section id="properties">
-<h2>Properties<a class="headerlink" href="#properties" title="Link to this heading">#</a></h2>
-<section id="should-render">
-<h3>should_render<a class="headerlink" href="#should-render" title="Link to this heading">#</a></h3>
-<p>Returns a JAX array indicating whether rendering should occur.</p>
-<p><strong>Type:</strong> jax.Array</p>
-<p><strong>Access:</strong> Read-only</p>
-</section>
-</section>
-<section id="methods">
-<h2>Methods<a class="headerlink" href="#methods" title="Link to this heading">#</a></h2>
-<section id="render-fn-state-state">
-<h3>render_fn(state: State)<a class="headerlink" href="#render-fn-state-state" title="Link to this heading">#</a></h3>
-<p>Function to be called for rendering a state.</p>
-<p><strong>Parameters:</strong></p>
-<ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">state</span></code> (State): Environment state to render</p></li>
-</ul>
-<p><strong>Note:</strong> This function is designed to be used with <code class="docutils literal notranslate"><span class="pre">jax.experimental.io_callback</span></code>.</p>
-</section>
-</section>
 </section>
 
     <script type="text/x-thebe-config">
@@ -483,7 +483,7 @@ document.write(`
         },
         kernelOptions: {
             name: "python3",
-            path: "./api"
+            path: "./."
         },
         predefinedOutput: true
     }
@@ -501,16 +501,16 @@ document.write(`
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="braxsender.html"
+       href="python-api/viewerwrapper.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">BraxSender</p>
+        <p class="prev-next-title">ViewerWrapper</p>
       </div>
     </a>
     <a class="right-next"
-       href="config.html"
+       href="internal/config.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
@@ -534,17 +534,14 @@ document.write(`
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#purpose">Purpose</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#constructor">Constructor</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#parameters">Parameters</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#properties">Properties</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#should-render">should_render</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#overview">Overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#components">Components</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#core-infrastructure">Core Infrastructure</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#data-processing">Data Processing</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#rendering">Rendering</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#methods">Methods</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#render-fn-state-state">render_fn(state: State)</a></li>
-</ul>
-</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#developer-notes">Developer Notes</a></li>
 </ul>
   </nav></div>
 
@@ -593,8 +590,8 @@ By Shouyue Hu (Google Summer of Code 2025)
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
-<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+  <script src="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
 
   <footer class="bd-footer">
   </footer>

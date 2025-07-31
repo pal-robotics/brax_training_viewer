@@ -32,7 +32,7 @@
     <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css?v=eba8b062" />
     <link rel="stylesheet" type="text/css" href="_static/togglebutton.css?v=13237357" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css?v=6644e6bb" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
     <link rel="stylesheet" type="text/css" href="_static/sphinx-thebe.css?v=4fa983c6" />
     <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
   
@@ -61,8 +61,8 @@
     <link rel="icon" href="_static/favicon.ico"/>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="WebViewer" href="api/webviewer.html" />
-    <link rel="prev" title="Error Handling" href="web-api/error-handling.html" />
+    <link rel="next" title="WebViewer" href="python-api/webviewer.html" />
+    <link rel="prev" title="WebSocket Endpoints" href="web-api/websocket-endpoints.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -191,20 +191,22 @@
 <li class="toctree-l1 has-children"><a class="reference internal" href="web-api.html">Web API</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="web-api/http-endpoints.html">HTTP Endpoints</a></li>
 <li class="toctree-l2"><a class="reference internal" href="web-api/websocket-endpoints.html">WebSocket Endpoints</a></li>
-<li class="toctree-l2"><a class="reference internal" href="web-api/error-handling.html">Error Handling</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 current active has-children"><a class="current reference internal" href="#">Python API</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="api/webviewer.html">WebViewer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/braxsender.html">BraxSender</a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/viewerwrapper.html">ViewerWrapper</a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/config.html">Config</a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/server.html">Server</a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/connectionmanager.html">ConnectionManager</a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/statestreamer.html">StateStreamer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/sender.html">Sender</a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/html-utils.html">HTML Utils</a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/utils.html">Utils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="python-api/webviewer.html">WebViewer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="python-api/braxsender.html">BraxSender</a></li>
+<li class="toctree-l2"><a class="reference internal" href="python-api/viewerwrapper.html">ViewerWrapper</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="internal.html">Internal Implementation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="internal/config.html">Config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="internal/server.html">Server</a></li>
+<li class="toctree-l2"><a class="reference internal" href="internal/connectionmanager.html">ConnectionManager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="internal/statestreamer.html">StateStreamer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="internal/sender.html">Sender</a></li>
+<li class="toctree-l2"><a class="reference internal" href="internal/html-utils.html">HTML Utils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="internal/utils.html">Utils</a></li>
 </ul>
 </details></li>
 </ul>
@@ -403,9 +405,7 @@ document.write(`
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#core-classes">Core Classes</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#server-components">Server Components</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#streaming-components">Streaming Components</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#utility-components">Utility Components</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#internal-components">Internal Components</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#quick-reference">Quick Reference</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#basic-usage">Basic Usage</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#configuration">Configuration</a></li>
@@ -428,32 +428,14 @@ document.write(`
 <section id="core-classes">
 <h2>Core Classes<a class="headerlink" href="#core-classes" title="Link to this heading">#</a></h2>
 <ul class="simple">
-<li><p><a class="reference internal" href="api/webviewer.html"><span class="doc std std-doc">WebViewer</span></a>: Main interface for starting and managing the web viewer server</p></li>
-<li><p><a class="reference internal" href="api/braxsender.html"><span class="doc std std-doc">BraxSender</span></a>: Handles serialization and communication with the web viewer server</p></li>
-<li><p><a class="reference internal" href="api/viewerwrapper.html"><span class="doc std std-doc">ViewerWrapper</span></a>: Brax environment wrapper that enables real-time rendering during training</p></li>
-<li><p><a class="reference internal" href="api/config.html"><span class="doc std std-doc">Config</span></a>: Configuration class for the viewer system</p></li>
+<li><p><a class="reference internal" href="python-api/webviewer.html"><span class="doc std std-doc">WebViewer</span></a>: Main interface for starting and managing the web viewer server</p></li>
+<li><p><a class="reference internal" href="python-api/braxsender.html"><span class="doc std std-doc">BraxSender</span></a>: Handles serialization and communication with the web viewer server</p></li>
+<li><p><a class="reference internal" href="python-api/viewerwrapper.html"><span class="doc std std-doc">ViewerWrapper</span></a>: Brax environment wrapper that enables real-time rendering during training</p></li>
 </ul>
 </section>
-<section id="server-components">
-<h2>Server Components<a class="headerlink" href="#server-components" title="Link to this heading">#</a></h2>
-<ul class="simple">
-<li><p><a class="reference internal" href="api/server.html"><span class="doc std std-doc">Server</span></a>: FastAPI application that handles HTTP and WebSocket endpoints</p></li>
-<li><p><a class="reference internal" href="api/connectionmanager.html"><span class="doc std std-doc">ConnectionManager</span></a>: Manages active WebSocket connections for control signals</p></li>
-</ul>
-</section>
-<section id="streaming-components">
-<h2>Streaming Components<a class="headerlink" href="#streaming-components" title="Link to this heading">#</a></h2>
-<ul class="simple">
-<li><p><a class="reference internal" href="api/statestreamer.html"><span class="doc std std-doc">StateStreamer</span></a>: Optimized WebSocket streamer for frontend communication</p></li>
-<li><p><a class="reference internal" href="api/sender.html"><span class="doc std std-doc">Sender</span></a>: Base sender class for communication with the viewer</p></li>
-</ul>
-</section>
-<section id="utility-components">
-<h2>Utility Components<a class="headerlink" href="#utility-components" title="Link to this heading">#</a></h2>
-<ul class="simple">
-<li><p><a class="reference internal" href="api/html-utils.html"><span class="doc std std-doc">HTML Utils</span></a>: Utilities for HTML rendering and visualization</p></li>
-<li><p><a class="reference internal" href="api/utils.html"><span class="doc std std-doc">Utils</span></a>: Utility functions for state conversion and processing</p></li>
-</ul>
+<section id="internal-components">
+<h2>Internal Components<a class="headerlink" href="#internal-components" title="Link to this heading">#</a></h2>
+<p>For internal implementation details, see the <a class="reference internal" href="internal.html"><span class="std std-doc">Internal Implementation</span></a> section.</p>
 </section>
 <section id="quick-reference">
 <h2>Quick Reference<a class="headerlink" href="#quick-reference" title="Link to this heading">#</a></h2>
@@ -526,16 +508,16 @@ document.write(`
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="web-api/error-handling.html"
+       href="web-api/websocket-endpoints.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Error Handling</p>
+        <p class="prev-next-title">WebSocket Endpoints</p>
       </div>
     </a>
     <a class="right-next"
-       href="api/webviewer.html"
+       href="python-api/webviewer.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
@@ -560,9 +542,7 @@ document.write(`
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#core-classes">Core Classes</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#server-components">Server Components</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#streaming-components">Streaming Components</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#utility-components">Utility Components</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#internal-components">Internal Components</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#quick-reference">Quick Reference</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#basic-usage">Basic Usage</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#configuration">Configuration</a></li>

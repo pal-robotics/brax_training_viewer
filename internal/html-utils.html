@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>StateStreamer &#8212; Brax Viewer</title>
+    <title>HTML Utils &#8212; Brax Viewer</title>
   
   
   
@@ -32,7 +32,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=eba8b062" />
     <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css?v=6644e6bb" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
   
@@ -57,12 +57,12 @@
     <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'api/statestreamer';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'internal/html-utils';</script>
     <link rel="icon" href="../_static/favicon.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Sender" href="sender.html" />
-    <link rel="prev" title="ConnectionManager" href="connectionmanager.html" />
+    <link rel="next" title="Utils" href="utils.html" />
+    <link rel="prev" title="Sender" href="sender.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -191,19 +191,21 @@
 <li class="toctree-l1 has-children"><a class="reference internal" href="../web-api.html">Web API</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../web-api/http-endpoints.html">HTTP Endpoints</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../web-api/websocket-endpoints.html">WebSocket Endpoints</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../web-api/error-handling.html">Error Handling</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1 current active has-children"><a class="reference internal" href="../python-api.html">Python API</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="webviewer.html">WebViewer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="braxsender.html">BraxSender</a></li>
-<li class="toctree-l2"><a class="reference internal" href="viewerwrapper.html">ViewerWrapper</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../python-api.html">Python API</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../python-api/webviewer.html">WebViewer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../python-api/braxsender.html">BraxSender</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../python-api/viewerwrapper.html">ViewerWrapper</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../internal.html">Internal Implementation</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="config.html">Config</a></li>
 <li class="toctree-l2"><a class="reference internal" href="server.html">Server</a></li>
 <li class="toctree-l2"><a class="reference internal" href="connectionmanager.html">ConnectionManager</a></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">StateStreamer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="statestreamer.html">StateStreamer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="sender.html">Sender</a></li>
-<li class="toctree-l2"><a class="reference internal" href="html-utils.html">HTML Utils</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">HTML Utils</a></li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html">Utils</a></li>
 </ul>
 </details></li>
@@ -278,7 +280,7 @@
       
       
       
-      <li><a href="https://github.com/pal-robotics/brax_training_viewer/issues/new?title=Issue%20on%20page%20%2Fapi/statestreamer.html&body=Your%20issue%20content%20here." target="_blank"
+      <li><a href="https://github.com/pal-robotics/brax_training_viewer/issues/new?title=Issue%20on%20page%20%2Finternal/html-utils.html&body=Your%20issue%20content%20here." target="_blank"
    class="btn btn-sm btn-source-issues-button dropdown-item"
    title="Open an issue"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -308,7 +310,7 @@
       
       
       
-      <li><a href="../_sources/api/statestreamer.md" target="_blank"
+      <li><a href="../_sources/internal/html-utils.md" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -392,7 +394,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>StateStreamer</h1>
+    <h1>HTML Utils</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -403,17 +405,10 @@ document.write(`
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#purpose">Purpose</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#constructor">Constructor</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#parameters">Parameters</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#methods">Methods</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#start">start()</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#stop">stop()</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#send-state-discard-queue-bool-false">send(state, discard_queue: bool = False)</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#discard-queue">discard_queue()</a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#properties">Properties</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#connected">connected</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#functions">Functions</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#render-from-json-sys-str-height-union-int-str-colab-bool-base-url-optional-str-str">render_from_json(sys: str, height: Union[int, str], colab: bool, base_url: Optional[str]) -&gt; str</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#render-sys-system-states-list-state-height-union-int-str-480-colab-bool-true-base-url-optional-str-none-str">render(sys: System, states: List[State], height: Union[int, str] = 480, colab: bool = True, base_url: Optional[str] = None) -&gt; str</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#save-path-str-sys-system-states-list-state">save(path: str, sys: System, states: List[State])</a></li>
 </ul>
 </li>
 </ul>
@@ -427,60 +422,55 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="statestreamer">
-<h1>StateStreamer<a class="headerlink" href="#statestreamer" title="Link to this heading">#</a></h1>
-<p>Optimized WebSocket streamer for frontend communication.</p>
+  <section class="tex2jax_ignore mathjax_ignore" id="html-utils">
+<h1>HTML Utils<a class="headerlink" href="#html-utils" title="Link to this heading">#</a></h1>
+<p>Utilities for HTML rendering and visualization.</p>
 <section id="purpose">
 <h2>Purpose<a class="headerlink" href="#purpose" title="Link to this heading">#</a></h2>
-<p>StateStreamer provides optimized WebSocket streaming for sending state data to the frontend. It runs in a background thread and handles automatic reconnection, queue management, and efficient state serialization.</p>
+<p>HTML utils provide functions for generating HTML content for the BraxViewer web interface. These functions handle system serialization, template rendering, and HTML file generation.</p>
 </section>
-<section id="constructor">
-<h2>Constructor<a class="headerlink" href="#constructor" title="Link to this heading">#</a></h2>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">StateStreamer</span><span class="p">(</span>
-    <span class="n">uri</span><span class="o">=</span><span class="s2">&quot;ws://localhost:8000/ws/frame&quot;</span><span class="p">,</span>
-    <span class="n">unbatched</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
-<span class="p">)</span>
-</pre></div>
-</div>
-</section>
-<section id="parameters">
-<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading">#</a></h2>
-<ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">uri</span></code> (str): WebSocket URI for frame streaming (default: “ws://localhost:8000/ws/frame”)</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">unbatched</span></code> (bool): Whether to use unbatched streaming (default: True)</p></li>
-</ul>
-</section>
-<section id="methods">
-<h2>Methods<a class="headerlink" href="#methods" title="Link to this heading">#</a></h2>
-<section id="start">
-<h3>start()<a class="headerlink" href="#start" title="Link to this heading">#</a></h3>
-<p>Start the background streaming thread.</p>
-</section>
-<section id="stop">
-<h3>stop()<a class="headerlink" href="#stop" title="Link to this heading">#</a></h3>
-<p>Stop the streaming thread and cleanup resources.</p>
-</section>
-<section id="send-state-discard-queue-bool-false">
-<h3>send(state, discard_queue: bool = False)<a class="headerlink" href="#send-state-discard-queue-bool-false" title="Link to this heading">#</a></h3>
-<p>Send a state to the WebSocket stream.</p>
+<section id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Link to this heading">#</a></h2>
+<section id="render-from-json-sys-str-height-union-int-str-colab-bool-base-url-optional-str-str">
+<h3>render_from_json(sys: str, height: Union[int, str], colab: bool, base_url: Optional[str]) -&gt; str<a class="headerlink" href="#render-from-json-sys-str-height-union-int-str-colab-bool-base-url-optional-str-str" title="Link to this heading">#</a></h3>
+<p>Render HTML from JSON system string.</p>
 <p><strong>Parameters:</strong></p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">state</span></code>: State to send (can be State object or JSON string)</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">discard_queue</span></code> (bool): If True, discard all previous states in queue (default: False)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sys</span></code> (str): JSON string representation of the system</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">height</span></code> (Union[int, str]): Height of the render window</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">colab</span></code> (bool): Whether to use CSS styles for colab</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">base_url</span></code> (Optional[str]): Base URL for serving visualizer files</p></li>
+</ul>
+<p><strong>Returns:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">str</span></code>: HTML string for the visualizer</p></li>
 </ul>
 </section>
-<section id="discard-queue">
-<h3>discard_queue()<a class="headerlink" href="#discard-queue" title="Link to this heading">#</a></h3>
-<p>Discard all items in the state queue.</p>
+<section id="render-sys-system-states-list-state-height-union-int-str-480-colab-bool-true-base-url-optional-str-none-str">
+<h3>render(sys: System, states: List[State], height: Union[int, str] = 480, colab: bool = True, base_url: Optional[str] = None) -&gt; str<a class="headerlink" href="#render-sys-system-states-list-state-height-union-int-str-480-colab-bool-true-base-url-optional-str-none-str" title="Link to this heading">#</a></h3>
+<p>Render HTML from system and states.</p>
+<p><strong>Parameters:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">sys</span></code> (System): Brax system object</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">states</span></code> (List[State]): List of system states to render</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">height</span></code> (Union[int, str]): Height of the render window (default: 480)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">colab</span></code> (bool): Whether to use CSS styles for colab (default: True)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">base_url</span></code> (Optional[str]): Base URL for serving visualizer files (default: None)</p></li>
+</ul>
+<p><strong>Returns:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">str</span></code>: HTML string for the visualizer</p></li>
+</ul>
 </section>
-</section>
-<section id="properties">
-<h2>Properties<a class="headerlink" href="#properties" title="Link to this heading">#</a></h2>
-<section id="connected">
-<h3>connected<a class="headerlink" href="#connected" title="Link to this heading">#</a></h3>
-<p>Current connection status.</p>
-<p><strong>Type:</strong> bool</p>
-<p><strong>Access:</strong> Read-only</p>
+<section id="save-path-str-sys-system-states-list-state">
+<h3>save(path: str, sys: System, states: List[State])<a class="headerlink" href="#save-path-str-sys-system-states-list-state" title="Link to this heading">#</a></h3>
+<p>Save trajectory as HTML file.</p>
+<p><strong>Parameters:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">path</span></code> (str): File path to save the HTML</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sys</span></code> (System): Brax system object</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">states</span></code> (List[State]): List of system states to save</p></li>
+</ul>
 </section>
 </section>
 </section>
@@ -498,7 +488,7 @@ document.write(`
         },
         kernelOptions: {
             name: "python3",
-            path: "./api"
+            path: "./internal"
         },
         predefinedOutput: true
     }
@@ -516,20 +506,20 @@ document.write(`
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="connectionmanager.html"
+       href="sender.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">ConnectionManager</p>
+        <p class="prev-next-title">Sender</p>
       </div>
     </a>
     <a class="right-next"
-       href="sender.html"
+       href="utils.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Sender</p>
+        <p class="prev-next-title">Utils</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -550,17 +540,10 @@ document.write(`
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#purpose">Purpose</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#constructor">Constructor</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#parameters">Parameters</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#methods">Methods</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#start">start()</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#stop">stop()</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#send-state-discard-queue-bool-false">send(state, discard_queue: bool = False)</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#discard-queue">discard_queue()</a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#properties">Properties</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#connected">connected</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#functions">Functions</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#render-from-json-sys-str-height-union-int-str-colab-bool-base-url-optional-str-str">render_from_json(sys: str, height: Union[int, str], colab: bool, base_url: Optional[str]) -&gt; str</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#render-sys-system-states-list-state-height-union-int-str-480-colab-bool-true-base-url-optional-str-none-str">render(sys: System, states: List[State], height: Union[int, str] = 480, colab: bool = True, base_url: Optional[str] = None) -&gt; str</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#save-path-str-sys-system-states-list-state">save(path: str, sys: System, states: List[State])</a></li>
 </ul>
 </li>
 </ul>

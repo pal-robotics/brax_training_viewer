@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>HTTP Endpoints &#8212; Brax Viewer</title>
+    <title>StateStreamer &#8212; Brax Viewer</title>
   
   
   
@@ -57,12 +57,12 @@
     <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'web-api/http-endpoints';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'internal/statestreamer';</script>
     <link rel="icon" href="../_static/favicon.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="WebSocket Endpoints" href="websocket-endpoints.html" />
-    <link rel="prev" title="Web API" href="../web-api.html" />
+    <link rel="next" title="Sender" href="sender.html" />
+    <link rel="prev" title="ConnectionManager" href="connectionmanager.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -188,9 +188,9 @@
 </details></li>
 <li class="toctree-l1"><a class="reference internal" href="../quick-start.html">Quick Start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../usage-guide.html">Usage Guide</a></li>
-<li class="toctree-l1 current active has-children"><a class="reference internal" href="../web-api.html">Web API</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">HTTP Endpoints</a></li>
-<li class="toctree-l2"><a class="reference internal" href="websocket-endpoints.html">WebSocket Endpoints</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../web-api.html">Web API</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../web-api/http-endpoints.html">HTTP Endpoints</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../web-api/websocket-endpoints.html">WebSocket Endpoints</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../python-api.html">Python API</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -199,14 +199,14 @@
 <li class="toctree-l2"><a class="reference internal" href="../python-api/viewerwrapper.html">ViewerWrapper</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../internal.html">Internal Implementation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="../internal/config.html">Config</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../internal/server.html">Server</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../internal/connectionmanager.html">ConnectionManager</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../internal/statestreamer.html">StateStreamer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../internal/sender.html">Sender</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../internal/html-utils.html">HTML Utils</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../internal/utils.html">Utils</a></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../internal.html">Internal Implementation</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="config.html">Config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="server.html">Server</a></li>
+<li class="toctree-l2"><a class="reference internal" href="connectionmanager.html">ConnectionManager</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">StateStreamer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sender.html">Sender</a></li>
+<li class="toctree-l2"><a class="reference internal" href="html-utils.html">HTML Utils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html">Utils</a></li>
 </ul>
 </details></li>
 </ul>
@@ -280,7 +280,7 @@
       
       
       
-      <li><a href="https://github.com/pal-robotics/brax_training_viewer/issues/new?title=Issue%20on%20page%20%2Fweb-api/http-endpoints.html&body=Your%20issue%20content%20here." target="_blank"
+      <li><a href="https://github.com/pal-robotics/brax_training_viewer/issues/new?title=Issue%20on%20page%20%2Finternal/statestreamer.html&body=Your%20issue%20content%20here." target="_blank"
    class="btn btn-sm btn-source-issues-button dropdown-item"
    title="Open an issue"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -310,7 +310,7 @@
       
       
       
-      <li><a href="../_sources/web-api/http-endpoints.md" target="_blank"
+      <li><a href="../_sources/internal/statestreamer.md" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -394,7 +394,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>HTTP Endpoints</h1>
+    <h1>StateStreamer</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -404,13 +404,18 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#main-interface">Main Interface</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#get"><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#purpose">Purpose</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#constructor">Constructor</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#parameters">Parameters</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#methods">Methods</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#start">start()</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#stop">stop()</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#send-state-discard-queue-bool-false">send(state, discard_queue: bool = False)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#discard-queue">discard_queue()</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#rendering-status-api">Rendering Status API</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#get-api-rendering-status"><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/api/rendering_status</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#post-api-rendering-status"><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/api/rendering_status</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#properties">Properties</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#connected">connected</a></li>
 </ul>
 </li>
 </ul>
@@ -424,105 +429,60 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="http-endpoints">
-<h1>HTTP Endpoints<a class="headerlink" href="#http-endpoints" title="Link to this heading">#</a></h1>
-<p>The Brax Web Viewer provides HTTP endpoints for server control and status management.</p>
-<section id="main-interface">
-<h2>Main Interface<a class="headerlink" href="#main-interface" title="Link to this heading">#</a></h2>
-<section id="get">
-<h3><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/</span></code><a class="headerlink" href="#get" title="Link to this heading">#</a></h3>
-<p>Returns the main HTML viewer interface.</p>
-<p><strong>Response</strong>: HTML page with the 3D visualization interface</p>
-<p><strong>Description</strong>:</p>
-<ul class="simple">
-<li><p>Serves the main viewer page</p></li>
-<li><p>If system JSON is available, renders the viewer with the system configuration</p></li>
-<li><p>Otherwise, shows a waiting page with instructions</p></li>
-</ul>
-<p><strong>Example Usage</strong>:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>curl<span class="w"> </span>http://127.0.0.1:8000/
-</pre></div>
-</div>
+  <section class="tex2jax_ignore mathjax_ignore" id="statestreamer">
+<h1>StateStreamer<a class="headerlink" href="#statestreamer" title="Link to this heading">#</a></h1>
+<p>Optimized WebSocket streamer for frontend communication.</p>
+<section id="purpose">
+<h2>Purpose<a class="headerlink" href="#purpose" title="Link to this heading">#</a></h2>
+<p>StateStreamer provides optimized WebSocket streaming for sending state data to the frontend. It runs in a background thread and handles automatic reconnection, queue management, and efficient state serialization.</p>
 </section>
-</section>
-<section id="rendering-status-api">
-<h2>Rendering Status API<a class="headerlink" href="#rendering-status-api" title="Link to this heading">#</a></h2>
-<section id="get-api-rendering-status">
-<h3><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/api/rendering_status</span></code><a class="headerlink" href="#get-api-rendering-status" title="Link to this heading">#</a></h3>
-<p>Returns the current rendering status.</p>
-<p><strong>Response</strong>:</p>
-<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;rendering_enabled&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p><strong>Description</strong>: Returns the current rendering enabled state from the server.</p>
-<p><strong>Example Usage</strong>:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>curl<span class="w"> </span>http://127.0.0.1:8000/api/rendering_status
-</pre></div>
-</div>
-<p><strong>Python Example</strong>:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">requests</span>
-
-<span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;http://127.0.0.1:8000/api/rendering_status&quot;</span><span class="p">)</span>
-<span class="n">status</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Rendering enabled: </span><span class="si">{</span><span class="n">status</span><span class="p">[</span><span class="s1">&#39;rendering_enabled&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
-</section>
-<section id="post-api-rendering-status">
-<h3><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/api/rendering_status</span></code><a class="headerlink" href="#post-api-rendering-status" title="Link to this heading">#</a></h3>
-<p>Sets the rendering state and broadcasts to all connected clients.</p>
-<p><strong>Request Body</strong>:</p>
-<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;rendering_enabled&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p><strong>Success Response</strong>:</p>
-<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;success&quot;</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;rendering_enabled&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p><strong>Error Response</strong>:</p>
-<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;error&quot;</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;message&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Error description&quot;</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p><strong>Description</strong>:</p>
-<ul class="simple">
-<li><p>Updates the rendering status on the server</p></li>
-<li><p>Broadcasts the change to all connected control clients</p></li>
-<li><p>Returns the updated status</p></li>
-</ul>
-<p><strong>Example Usage</strong>:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>http://127.0.0.1:8000/api/rendering_status<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Content-Type: application/json&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>-d<span class="w"> </span><span class="s1">&#39;{&quot;rendering_enabled&quot;: false}&#39;</span>
-</pre></div>
-</div>
-<p><strong>Python Example</strong>:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">requests</span>
-
-<span class="c1"># Enable rendering</span>
-<span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
-    <span class="s2">&quot;http://127.0.0.1:8000/api/rendering_status&quot;</span><span class="p">,</span>
-    <span class="n">json</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;rendering_enabled&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+<section id="constructor">
+<h2>Constructor<a class="headerlink" href="#constructor" title="Link to this heading">#</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">StateStreamer</span><span class="p">(</span>
+    <span class="n">uri</span><span class="o">=</span><span class="s2">&quot;ws://localhost:8000/ws/frame&quot;</span><span class="p">,</span>
+    <span class="n">unbatched</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
 <span class="p">)</span>
-<span class="n">result</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
-
-<span class="c1"># Disable rendering</span>
-<span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
-    <span class="s2">&quot;http://127.0.0.1:8000/api/rendering_status&quot;</span><span class="p">,</span>
-    <span class="n">json</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;rendering_enabled&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
-<span class="p">)</span>
-<span class="n">result</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
 </pre></div>
 </div>
+</section>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">uri</span></code> (str): WebSocket URI for frame streaming (default: “ws://localhost:8000/ws/frame”)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">unbatched</span></code> (bool): Whether to use unbatched streaming (default: True)</p></li>
+</ul>
+</section>
+<section id="methods">
+<h2>Methods<a class="headerlink" href="#methods" title="Link to this heading">#</a></h2>
+<section id="start">
+<h3>start()<a class="headerlink" href="#start" title="Link to this heading">#</a></h3>
+<p>Start the background streaming thread.</p>
+</section>
+<section id="stop">
+<h3>stop()<a class="headerlink" href="#stop" title="Link to this heading">#</a></h3>
+<p>Stop the streaming thread and cleanup resources.</p>
+</section>
+<section id="send-state-discard-queue-bool-false">
+<h3>send(state, discard_queue: bool = False)<a class="headerlink" href="#send-state-discard-queue-bool-false" title="Link to this heading">#</a></h3>
+<p>Send a state to the WebSocket stream.</p>
+<p><strong>Parameters:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">state</span></code>: State to send (can be State object or JSON string)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">discard_queue</span></code> (bool): If True, discard all previous states in queue (default: False)</p></li>
+</ul>
+</section>
+<section id="discard-queue">
+<h3>discard_queue()<a class="headerlink" href="#discard-queue" title="Link to this heading">#</a></h3>
+<p>Discard all items in the state queue.</p>
+</section>
+</section>
+<section id="properties">
+<h2>Properties<a class="headerlink" href="#properties" title="Link to this heading">#</a></h2>
+<section id="connected">
+<h3>connected<a class="headerlink" href="#connected" title="Link to this heading">#</a></h3>
+<p>Current connection status.</p>
+<p><strong>Type:</strong> bool</p>
+<p><strong>Access:</strong> Read-only</p>
 </section>
 </section>
 </section>
@@ -540,7 +500,7 @@ document.write(`
         },
         kernelOptions: {
             name: "python3",
-            path: "./web-api"
+            path: "./internal"
         },
         predefinedOutput: true
     }
@@ -558,20 +518,20 @@ document.write(`
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="../web-api.html"
+       href="connectionmanager.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Web API</p>
+        <p class="prev-next-title">ConnectionManager</p>
       </div>
     </a>
     <a class="right-next"
-       href="websocket-endpoints.html"
+       href="sender.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">WebSocket Endpoints</p>
+        <p class="prev-next-title">Sender</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -591,13 +551,18 @@ document.write(`
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#main-interface">Main Interface</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#get"><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#purpose">Purpose</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#constructor">Constructor</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#parameters">Parameters</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#methods">Methods</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#start">start()</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#stop">stop()</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#send-state-discard-queue-bool-false">send(state, discard_queue: bool = False)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#discard-queue">discard_queue()</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#rendering-status-api">Rendering Status API</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#get-api-rendering-status"><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/api/rendering_status</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#post-api-rendering-status"><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/api/rendering_status</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#properties">Properties</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#connected">connected</a></li>
 </ul>
 </li>
 </ul>

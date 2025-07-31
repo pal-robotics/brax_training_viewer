@@ -106,36 +106,3 @@ response = requests.post(
 )
 result = response.json()
 ```
-
-## Error Handling
-
-### HTTP Status Codes
-
-- **200 OK**: Successful request
-- **400 Bad Request**: Invalid request format or missing required fields
-- **500 Internal Server Error**: Server processing error
-
-### Error Response Format
-
-```json
-{
-  "status": "error",
-  "message": "Detailed error description"
-}
-```
-
-## Rate Limiting
-
-The server includes optimized logging for frequent status requests:
-- Status endpoint logging is disabled to reduce noise
-- No rate limiting is applied to status endpoints
-- All requests are processed immediately
-
-## CORS Support
-
-All HTTP endpoints support CORS with the following configuration:
-- **Allow Origins**: `*` (all origins)
-- **Allow Methods**: `GET`, `POST`, `OPTIONS`
-- **Allow Headers**: `*` (all headers)
-
-This enables cross-origin requests from web applications. 

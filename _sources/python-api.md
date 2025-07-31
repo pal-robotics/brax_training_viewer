@@ -4,25 +4,13 @@ This section provides detailed documentation for all Python classes and componen
 
 ## Core Classes
 
-- [WebViewer](api/webviewer): Main interface for starting and managing the web viewer server
-- [BraxSender](api/braxsender): Handles serialization and communication with the web viewer server
-- [ViewerWrapper](api/viewerwrapper): Brax environment wrapper that enables real-time rendering during training
-- [Config](api/config): Configuration class for the viewer system
+- [WebViewer](python-api/webviewer): Main interface for starting and managing the web viewer server
+- [BraxSender](python-api/braxsender): Handles serialization and communication with the web viewer server
+- [ViewerWrapper](python-api/viewerwrapper): Brax environment wrapper that enables real-time rendering during training
 
-## Server Components
+## Internal Components
 
-- [Server](api/server): FastAPI application that handles HTTP and WebSocket endpoints
-- [ConnectionManager](api/connectionmanager): Manages active WebSocket connections for control signals
-
-## Streaming Components
-
-- [StateStreamer](api/statestreamer): Optimized WebSocket streamer for frontend communication
-- [Sender](api/sender): Base sender class for communication with the viewer
-
-## Utility Components
-
-- [HTML Utils](api/html-utils): Utilities for HTML rendering and visualization
-- [Utils](api/utils): Utility functions for state conversion and processing
+For internal implementation details, see the [Internal Implementation](internal.md) section.
 
 ## Quick Reference
 

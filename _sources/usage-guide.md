@@ -86,7 +86,7 @@ See the `examples/` directory for complete working examples:
 
 ## Advanced Usage
 
-For detailed API documentation and advanced integration patterns, see the [Server API](server-api) documentation.
+For detailed API documentation and advanced integration patterns, see the [Python API](python-api) documentation.
 
 ## Troubleshooting
 
