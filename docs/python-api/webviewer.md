@@ -24,11 +24,11 @@ WebViewer(
 - `port` ([int](https://docs.python.org/3/c-api/long.html)): Server port (default: 8000)
 - `log_level` ([str](https://docs.python.org/3/library/stdtypes.html#text-sequence-type-str)): Logging level for the viewer (default: "info")
 - `server_log_level` ([str](https://docs.python.org/3/library/stdtypes.html#text-sequence-type-str)): Logging level for the server (default: "warning")
-- `**kwargs`: Additional configuration parameters passed to Config
+- `**kwargs`: Additional configuration parameters passed to [`Config`](../internal/config.md)
 
 ## Methods
 
-### run(use_thread: bool = True, wait_for_startup: int = 2)
+### `run(use_thread: bool = True, wait_for_startup: int = 2)`
 
 Start the server and initialize the viewer.
 
@@ -36,11 +36,11 @@ Start the server and initialize the viewer.
 - `use_thread` ([bool](https://docs.python.org/3/c-api/bool.html)): Whether to run server in background thread (default: True)
 - `wait_for_startup` ([int](https://docs.python.org/3/c-api/long.html)): Seconds to wait for server startup (default: 2)
 
-### stop()
+### `stop()`
 
 Stop the server and cleanup resources.
 
-### send_frame(state: State, env_id: int = 0)
+### `send_frame(state: State, env_id: int = 0)`
 
 Send a frame to the viewer.
 
@@ -48,7 +48,7 @@ Send a frame to the viewer.
 - `state` ([Brax State](https://github.com/google/brax/blob/main/brax/envs/base.py)): Brax environment state to send
 - `env_id` ([int](https://docs.python.org/3/c-api/long.html)): Environment ID for batched environments (default: 0)
 
-### stitch_state(batched_state: State) -> State
+### `stitch_state(batched_state: State) -> State`
 
 Convert batched state to single state.
 
@@ -58,7 +58,7 @@ Convert batched state to single state.
 **Returns:**
 - [Brax State](https://github.com/google/brax/blob/main/brax/envs/base.py): Single environment state
 
-### log(message: str, level: str = "info")
+### `log(message: str, level: str = "info")`
 
 Log a message with specified level.
 
@@ -68,7 +68,7 @@ Log a message with specified level.
 
 ## Properties
 
-### rendering_enabled
+### `rendering_enabled`
 
 Get or set the rendering enabled state.
 

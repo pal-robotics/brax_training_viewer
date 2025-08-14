@@ -13,10 +13,10 @@ HTML utils provide functions for generating HTML content for the BraxViewer web 
 Render HTML from JSON system string.
 
 **Parameters:**
-- `sys` (str): JSON string representation of the system
-- `height` (Union[int, str]): Height of the render window
-- `colab` (bool): Whether to use CSS styles for colab
-- `base_url` (Optional[str]): Base URL for serving visualizer files
+- `sys` ([str](https://docs.python.org/3/library/stdtypes.html#text-sequence-type-str)): JSON string representation of the system
+- `height` (Union[[int](https://docs.python.org/3/c-api/long.html), [str](https://docs.python.org/3/library/stdtypes.html#text-sequence-type-str)]): Height of the render window
+- `colab` ([bool](https://docs.python.org/3/c-api/bool.html)): Whether to use CSS styles for colab
+- `base_url` (Optional[[str](https://docs.python.org/3/library/stdtypes.html#text-sequence-type-str)]): Base URL for serving visualizer files
 
 **Returns:**
 - `str`: HTML string for the visualizer
@@ -26,11 +26,11 @@ Render HTML from JSON system string.
 Render HTML from system and states.
 
 **Parameters:**
-- `sys` (System): Brax system object
-- `states` (List[State]): List of system states to render
-- `height` (Union[int, str]): Height of the render window (default: 480)
-- `colab` (bool): Whether to use CSS styles for colab (default: True)
-- `base_url` (Optional[str]): Base URL for serving visualizer files (default: None)
+- `sys` ([System](https://github.com/google/brax/blob/main/brax/base.py)): Brax system object
+- `states` (List[[State](https://github.com/google/brax/blob/main/brax/envs/base.py)]): List of system states to render
+- `height` (Union[[int](https://docs.python.org/3/c-api/long.html), [str](https://docs.python.org/3/library/stdtypes.html#text-sequence-type-str)]): Height of the render window (default: 480)
+- `colab` ([bool](https://docs.python.org/3/c-api/bool.html)): Whether to use CSS styles for colab (default: True)
+- `base_url` (Optional[[str](https://docs.python.org/3/library/stdtypes.html#text-sequence-type-str)]): Base URL for serving visualizer files (default: None)
 
 **Returns:**
 - `str`: HTML string for the visualizer
@@ -40,6 +40,6 @@ Render HTML from system and states.
 Save trajectory as HTML file.
 
 **Parameters:**
-- `path` (str): File path to save the HTML
-- `sys` (System): Brax system object
-- `states` (List[State]): List of system states to save 
+- `path` ([str](https://docs.python.org/3/library/stdtypes.html#text-sequence-type-str)): File path to save the HTML
+- `sys` ([System](https://github.com/google/brax/blob/main/brax/base.py)): Brax system object
+- `states` (List[[State](https://github.com/google/brax/blob/main/brax/envs/base.py)]): List of system states to save 

@@ -14,7 +14,7 @@ Server(sender)
 
 ## Parameters
 
-- `sender`: BraxSender instance for communication
+- `sender`: [`BraxSender`](../python-api/braxsender.md) instance for communication
 
 ## Methods
 
@@ -23,8 +23,8 @@ Server(sender)
 Start the server.
 
 **Parameters:**
-- `use_thread` (bool): Whether to run server in background thread (default: True)
-- `wait_for_startup` (int): Seconds to wait for server startup (default: 2)
+- `use_thread` ([bool](https://docs.python.org/3/c-api/bool.html)): Whether to run server in background thread (default: True)
+- `wait_for_startup` ([int](https://docs.python.org/3/c-api/long.html)): Seconds to wait for server startup (default: 2)
 
 ### stop()
 
@@ -35,4 +35,4 @@ Stop the server and cleanup resources.
 Broadcast frame data to all clients.
 
 **Parameters:**
-- `data` (str): Frame data to broadcast 
+- `data` ([str](https://docs.python.org/3/library/stdtypes.html#text-sequence-type-str)): Frame data to broadcast 

@@ -14,7 +14,7 @@ ConnectionManager(sender)
 
 ## Parameters
 
-- `sender`: BraxSender instance for communication
+- `sender`: [`BraxSender`](../python-api/braxsender.md) instance for communication
 
 ## Methods
 
@@ -23,18 +23,18 @@ ConnectionManager(sender)
 Accept a new WebSocket connection.
 
 **Parameters:**
-- `websocket` (WebSocket): WebSocket connection to accept
+- `websocket` ([WebSocket](https://www.starlette.io/websockets/)): WebSocket connection to accept
 
 ### disconnect(websocket: WebSocket)
 
 Remove a WebSocket connection.
 
 **Parameters:**
-- `websocket` (WebSocket): WebSocket connection to remove
+- `websocket` ([WebSocket](https://www.starlette.io/websockets/)): WebSocket connection to remove
 
 ### broadcast(message: dict)
 
 Broadcast message to all connected clients.
 
 **Parameters:**
-- `message` (dict): Message to broadcast to all clients 
+- `message` ([dict](https://docs.python.org/3/library/stdtypes.html#mapping-types-dict)): Message to broadcast to all clients 

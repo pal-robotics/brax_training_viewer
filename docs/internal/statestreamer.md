@@ -17,8 +17,8 @@ StateStreamer(
 
 ## Parameters
 
-- `uri` (str): WebSocket URI for frame streaming (default: "ws://localhost:8000/ws/frame")
-- `unbatched` (bool): Whether to use unbatched streaming (default: True)
+- `uri` ([str](https://docs.python.org/3/library/stdtypes.html#text-sequence-type-str)): WebSocket URI for frame streaming (default: "ws://localhost:8000/ws/frame")
+- `unbatched` ([bool](https://docs.python.org/3/c-api/bool.html)): Whether to use unbatched streaming (default: True)
 
 ## Methods
 
@@ -36,7 +36,7 @@ Send a state to the WebSocket stream.
 
 **Parameters:**
 - `state`: State to send (can be State object or JSON string)
-- `discard_queue` (bool): If True, discard all previous states in queue (default: False)
+- `discard_queue` ([bool](https://docs.python.org/3/c-api/bool.html)): If True, discard all previous states in queue (default: False)
 
 ### discard_queue()
 
@@ -48,6 +48,6 @@ Discard all items in the state queue.
 
 Current connection status.
 
-**Type:** bool
+**Type:** [bool](https://docs.python.org/3/c-api/bool.html)
 
 **Access:** Read-only 

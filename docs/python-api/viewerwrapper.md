@@ -18,11 +18,11 @@ ViewerWrapper(
 ## Parameters
 
 - `env`: The Brax environment to wrap ([Brax Env](https://github.com/google/brax/blob/main/brax/envs/base.py))
-- `sender`: A sender instance (e.g., BraxSender) with `send_frame` method and `rendering_enabled` property
+- `sender`: A [`Sender`](../internal/sender.md) instance (e.g., [`BraxSender`](braxsender.md)) with `send_frame` method and `rendering_enabled` property
 
 ## Properties
 
-### should_render
+### `should_render`
 
 Returns a JAX array indicating whether rendering should occur.
 
@@ -32,7 +32,7 @@ Returns a JAX array indicating whether rendering should occur.
 
 ## Methods
 
-### render_fn(state: State)
+### `render_fn(state: State)`
 
 Function to be called for rendering a state.
 

@@ -19,8 +19,8 @@ BraxSender(
 
 ## Parameters
 
-- `config`: Optional Config object
-- `**kwargs`: Configuration parameters if config is not provided
+- `config`: Optional [`Config`](../internal/config.md) object
+- `**kwargs`: Configuration parameters if `config` is not provided
 
 ## Methods
 
@@ -42,7 +42,7 @@ Sends a single frame from a specific environment to the server. It calculates th
 
 **Parameters:**
 - `state` ([Brax State](https://github.com/google/brax/blob/main/brax/envs/base.py)): The Brax environment state to send.
-- `env_id` (int): The ID of the environment for batched environments (default: 0).
+- `env_id` ([int](https://docs.python.org/3/c-api/long.html)): The ID of the environment for batched environments (default: 0).
 
 ### `stitch_state(batched_state: State) -> State`
 
@@ -59,10 +59,10 @@ Stitches a batched state from multiple environments into a single state that can
 Sets the rendering state on the server via an HTTP POST request.
 
 **Parameters:**
-- `enabled` (bool): Whether rendering should be enabled.
+- `enabled` ([bool](https://docs.python.org/3/c-api/bool.html)): Whether rendering should be enabled.
 
 **Returns:**
-- (bool): `True` if the request was successful, `False` otherwise.
+- ([bool](https://docs.python.org/3/c-api/bool.html)): `True` if the request was successful, `False` otherwise.
 
 ## Properties
 
@@ -70,6 +70,6 @@ Sets the rendering state on the server via an HTTP POST request.
 
 Gets or sets the rendering enabled state.
 
-**Type:** bool
+**Type:** [bool](https://docs.python.org/3/c-api/bool.html)
 
-**Access:** Read/Write 
+**Access:** Read/Write
