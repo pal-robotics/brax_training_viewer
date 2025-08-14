@@ -1,0 +1,37 @@
+# Table of contents
+# Learn more at https://jupyterbook.org/customize/toc.html
+
+format: jb-book
+root: intro
+chapters:
+- file: installation
+  sections:
+  - file: installation/installation-pip
+  - file: installation/troubleshooting
+- file: quick-start
+- file: usage-guide
+- file: integration-guide
+- file: web-api
+  sections:
+  - file: web-api/http-endpoints
+  - file: web-api/websocket-endpoints
+- file: python-api
+  sections:
+  - file: python-api/webviewer
+  - file: python-api/braxsender
+  - file: python-api/viewerwrapper
+- file: internal
+  sections:
+  - file: internal/config
+  - file: internal/server
+  - file: internal/connectionmanager
+  - file: internal/statestreamer
+  - file: internal/sender
+  - file: internal/html-utils
+  - file: internal/utils
+- file: benchmarks
+  sections:
+  - file: benchmarks/humanoid
+  - file: benchmarks/cartpole
+- file: contributing
+

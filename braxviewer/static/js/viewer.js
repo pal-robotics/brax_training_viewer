@@ -66,6 +66,26 @@ class Viewer {
     this.scene = createScene(system);
     this.trajectory = createTrajectory(system);
 
+    // For batched envs, calculate the number of links in a single sub-env.
+    // This is used to map global link indices to local ones.
+    this.numLinksPerEnv = 0;
+    // A batched env is detected if any geom name ends with `_` followed by a digit.
+    const isBatched = Object.keys(this.system.geoms).some(name => /_\d+$/.test(name));
+
+    if (isBatched) {
+        const env0_link_indices = new Set();
+        // Geoms for env 0 are those that DO NOT end in `_` followed by a digit.
+        for (const [name, geoms] of Object.entries(this.system.geoms)) {
+            if (!/_\d+$/.test(name)) {
+                const link_idx = geoms[0].link_idx;
+                if (link_idx != null && link_idx >= 0) {
+                    env0_link_indices.add(link_idx);
+                }
+            }
+        }
+        this.numLinksPerEnv = env0_link_indices.size;
+    }
+
     this.renderer = new THREE.WebGLRenderer({antialias: true, alpha: true});
     this.renderer.shadowMap.enabled = true;
     this.renderer.outputEncoding = THREE.sRGBEncoding;
@@ -114,7 +134,7 @@ class Viewer {
     // Add rendering toggle switch
     this.rendering = { enabled: true };
     const renderFolder = this.gui.addFolder('Real-time Rendering');
-    renderFolder.add(this.rendering, 'enabled').name('Enable')
+    this.renderToggle = renderFolder.add(this.rendering, 'enabled').name('Enable')
       .onChange((value) => {
         if (window.control_ws) {
             window.control_ws.send(JSON.stringify({ type: 'toggle_render', enabled: value }));
@@ -329,27 +349,63 @@ function handleFrame(frameJson) {
 
   const frame = parsed.x;
   const scene = viewerInstance.scene;
+  const env_id = parsed.env_id;
 
   if (!frame.pos || !frame.rot) {
     console.warn('Invalid frame format: missing pos or rot');
     return;
   }
 
+  // Get the number of links per environment. If not calculated (e.g. single env),
+  // it will be 0, and we'll use the global index.
+  const numLinks = viewerInstance.numLinksPerEnv || 0;
+
   Object.entries(viewerInstance.system.geoms).forEach(function ([name, geoms]) {
-    const link_idx = geoms[0].link_idx;
-    if (link_idx == null || link_idx < 0) return;
+    // For batched envs, only process geoms belonging to the current frame's env_id.
+    if (numLinks > 0) {
+        let name_matches_env = false;
+        if (env_id === 0) {
+            // Env 0 geoms should NOT have a numeric suffix.
+            if (!/_\d+$/.test(name)) {
+                name_matches_env = true;
+            }
+        } else {
+            // Other env geoms should end with the corresponding `_env_id`.
+            if (name.endsWith(`_${env_id}`)) {
+                name_matches_env = true;
+            }
+        }
+        if (!name_matches_env) {
+            return; // Skip geoms from other environments.
+        }
+    }
+
+    const global_link_idx = geoms[0].link_idx;
+    if (global_link_idx == null || global_link_idx < 0) return;
+
+    let local_link_idx = global_link_idx;
+    if (numLinks > 0) {
+      // Map the global link index from the concatenated system to the local
+      // index of the single-environment state data.
+      local_link_idx = global_link_idx % numLinks;
+    }
 
     const groupName = name.replaceAll('/', '_');
     const group = scene.getObjectByName(groupName);
     if (!group) {
-      console.warn('Missing scene object for:', groupName);
+      // It's possible not all geoms are being updated, so this is not a fatal error.
       return;
     }
 
-    const pos = frame.pos[link_idx];
+    if (local_link_idx >= frame.pos.length) {
+      console.warn(`Index out of bounds: local_link_idx ${local_link_idx} for frame.pos of length ${frame.pos.length}`);
+      return;
+    }
+
+    const pos = frame.pos[local_link_idx];
     group.position.fromArray(pos);
 
-    const rot = frame.rot[link_idx];
+    const rot = frame.rot[local_link_idx];
     group.quaternion.set(rot[1], rot[2], rot[3], rot[0]);  // [w, x, y, z] → [x, y, z, w]
   });
 
@@ -362,33 +418,33 @@ function setupLiveFrameWebSocket(system, viewer) {
   viewerInstance = viewer;
   const ws = new WebSocket(`ws://${window.location.host}/ws/frame`);
 
-  // Add status light for live frame WS
-  const frameStatus = { status: 'Connecting' };
-  const frameFolder = viewer.gui.addFolder('Live Frame WS Status');
-  const frameCtrl = frameFolder.add(frameStatus, 'status').listen();
-  frameFolder.domElement.style.color = 'red';
-  frameFolder.close();
+  // Add unified status light for WebSocket connections
+  const wsStatus = { status: 'Connecting' };
+  const wsFolder = viewer.gui.addFolder('WebSocket Status');
+  const wsCtrl = wsFolder.add(wsStatus, 'status').listen();
+  wsFolder.domElement.style.color = 'red';
+  wsFolder.close();
 
-  function setFrameStatus(text, color) {
-    frameStatus.status = text;
-    frameCtrl.updateDisplay();
-    frameFolder.domElement.style.color = color;
+  function setWSStatus(text, color) {
+    wsStatus.status = text;
+    wsCtrl.updateDisplay();
+    wsFolder.domElement.style.color = color;
   }
 
   ws.onopen = () => {
     console.log('Connected to live frame WebSocket:', window.location.host);
-    setFrameStatus('Connected', 'green');
+    setWSStatus(`Connected to ${window.location.host}`, 'green');
   };
   ws.onmessage = (event) => {
     handleFrame(event.data);
   };
   ws.onclose = () => {
     console.log('WebSocket closed');
-    setFrameStatus('Disconnected', 'yellow');
+    setWSStatus('Disconnected', 'yellow');
   };
   ws.onerror = (e) => {
     console.error('WebSocket error:', e);
-    setFrameStatus('Error', 'red');
+    setWSStatus('Error', 'red');
   };
 }
 
@@ -396,30 +452,14 @@ function setupControlWebSocket(viewer) {
   const ws = new WebSocket(`ws://${window.location.host}/ws/control`);
   window.control_ws = ws; // Make ws globally accessible for the GUI callback
 
-  // Add status light for control WS
-  const controlStatus = { status: 'Connecting' };
-  const controlFolder = viewer.gui.addFolder('Control WS Status');
-  const controlCtrl = controlFolder.add(controlStatus, 'status').listen();
-  controlFolder.domElement.style.color = 'red';
-  controlFolder.close();
-
-  function setControlStatus(text, color) {
-    controlStatus.status = text;
-    controlCtrl.updateDisplay();
-    controlFolder.domElement.style.color = color;
-  }
-
   ws.onopen = () => {
     console.log('[Control] Connected');
-    setControlStatus('Connected', 'green');
   };
   ws.onclose = () => {
     console.warn('[Control] Disconnected');
-    setControlStatus('Disconnected', 'yellow');
   };
   ws.onerror = (e) => {
     console.error('[Control] Error:', e);
-    setControlStatus('Error', 'red');
   };
 
   ws.onmessage = (e) => {
@@ -431,8 +471,19 @@ function setupControlWebSocket(viewer) {
       return;
     }
 
+    console.log('[Control] Received message:', msg);
+
     if (msg.type === 'refresh_web') {
       window.location.reload();
+    } else if (msg.type === 'set_render_state') {
+      console.log('[Control] Setting render state to:', msg.enabled);
+      if (viewer.renderToggle) {
+        viewer.rendering.enabled = msg.enabled;
+        viewer.renderToggle.updateDisplay();
+        console.log('[Control] Updated render toggle to:', msg.enabled);
+      } else {
+        console.warn('[Control] renderToggle not found');
+      }
     }
   };
 }

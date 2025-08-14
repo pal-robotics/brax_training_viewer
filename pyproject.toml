@@ -23,4 +23,7 @@ dependencies = [
 ]
 
 [tool.setuptools.packages.find]
-include = ["braxviewer"]
+include = ["braxviewer*"]
+
+[tool.setuptools.package-data]
+braxviewer = ["static/**/*", "core/**/*", "utils/**/*"]

@@ -62,4 +62,5 @@ sysinfo.txt
 
 UnitySDK.log
 #==========================================================================
-braxviewer/.cache/
+
+docs/_build
