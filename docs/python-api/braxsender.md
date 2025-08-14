@@ -22,6 +22,16 @@ BraxSender(
 - `config`: Optional [`Config`](../internal/config.md) object
 - `**kwargs`: Configuration parameters if `config` is not provided
 
+## Properties
+
+### `rendering_enabled`
+
+Gets or sets the rendering enabled state.
+
+**Type:** [bool](https://docs.python.org/3/c-api/bool.html)
+
+**Access:** Read/Write
+
 ## Methods
 
 ### `start()`
@@ -63,13 +73,3 @@ Sets the rendering state on the server via an HTTP POST request.
 
 **Returns:**
 - ([bool](https://docs.python.org/3/c-api/bool.html)): `True` if the request was successful, `False` otherwise.
-
-## Properties
-
-### `rendering_enabled`
-
-Gets or sets the rendering enabled state.
-
-**Type:** [bool](https://docs.python.org/3/c-api/bool.html)
-
-**Access:** Read/Write
