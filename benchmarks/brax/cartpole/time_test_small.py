@@ -17,8 +17,8 @@ from brax.io import mjcf
 from brax.envs.base import PipelineEnv, State
 from braxviewer.WebViewer import WebViewer
 from braxviewer.BraxSender import BraxSender
-from brax.training.agents.ppo import train as ppo
-from brax.training.agents.ppo import networks as ppo_networks
+from braxviewer.brax.training.agents.ppo import train as ppo
+from braxviewer.brax.training.agents.ppo import networks as ppo_networks
 from braxviewer.wrapper import ViewerWrapper
 
 # Configuration
