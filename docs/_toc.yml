@@ -33,5 +33,6 @@ chapters:
   sections:
   - file: benchmarks/humanoid
   - file: benchmarks/cartpole
+  - file: benchmarks/original_vs_modified_ppo
 - file: contributing
 
