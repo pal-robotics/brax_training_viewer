@@ -18,9 +18,8 @@ class ViewerWrapper(Wrapper):
         self.sender = sender
 
     @property
-    def should_render(self) -> jax.Array:
-        """Returns a JAX array indicating whether rendering should occur."""
-        return jnp.array(self.sender.rendering_enabled, dtype=jnp.bool_)
+    def should_render(self) -> bool:
+        return bool(self.sender.rendering_enabled)
 
     def render_fn(self, state: State):
         """The function to be called for rendering a state.

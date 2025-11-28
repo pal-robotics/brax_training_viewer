@@ -238,7 +238,6 @@ def train(
     policy_params_fn: Callable[..., None] = lambda *args: None,
     # rendering
     render_fn: Optional[Callable[[envs.State], None]] = None,
-    should_render: jax.Array = jnp.array(True, dtype=jnp.bool_),
     # checkpointing
     save_checkpoint_path: Optional[str] = None,
     restore_checkpoint_path: Optional[str] = None,
@@ -708,14 +707,15 @@ def train(
     logging.info('starting iteration %s %s', it, time.time() - xt)
 
     for _ in range(max(num_resets_per_eval, 1)):
-      # optimization
-
-      # check for rendering dynamically
+      # Check whether rendering is enabled dynamically via a generic env hook.
+      # Environments that support real-time rendering (e.g. wrapped by an external
+      # viewer) can expose a boolean `should_render` attribute. Brax itself does
+      # not depend on any specific viewer implementation.
       should_render_py = False
-      if hasattr(environment, 'sender'):
-          should_render_py = environment.sender.rendering_enabled
+      if hasattr(environment, 'should_render'):
+          should_render_py = bool(environment.should_render)
 
-      should_render_jax = jnp.array(should_render_py, dtype=jnp.bool_)
+      should_render_jax = jnp.array(should_render_py, dtype=bool)
       should_render_replicated = jax.device_put_replicated(
           should_render_jax, jax.local_devices()[:local_devices_to_use]
       )
