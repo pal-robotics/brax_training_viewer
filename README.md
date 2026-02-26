@@ -26,6 +26,7 @@ Architected for JAX's Just-in-time (JIT) compilation paradigm, the viewer visual
 - **Lightweight**: Depends only on widely used standard packages
 - **Interactive controls**: Enable/disable rendering through the web interface to save compute resource on the fly
 - **Distributed architecture**: Viewer server runs independently from training process
+- ** As 2 Pull request are required to my submission for that I am writing a change.
 
 ## Installation and Setup
 
